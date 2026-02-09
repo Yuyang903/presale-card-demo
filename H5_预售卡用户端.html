@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>享乐派 - 商品兑换</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --bg-color: #f5f5f5;
+            --text-main: #333;
+            --text-sub: #999;
+            --border-color: #eee;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e0e0e0; /* PC背景色 */
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 模拟手机容器 */
+        #app-container {
+            width: 100%;
+            max-width: 480px; /* 限制最大宽度，模拟手机 */
+            height: 100%;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 页面通用样式 */
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* overflow-y: auto;  移除旧的滚动方式 */
+            background-color: var(--bg-color);
+            display: none;
+            flex-direction: column;
+            /* padding-bottom: 60px; 移除底部padding */
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        /* 新增：内容滚动区域 */
+        .page-scroll-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 顶部导航栏 (模拟) */
+        .nav-bar {
+            height: 44px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 17px;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            /* position: sticky; 移除 sticky，因为现在是 flex 布局 */
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-back {
+            position: absolute;
+            left: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* 通用组件 */
+        .m-card {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .m-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+        
+        .m-btn:active { opacity: 0.9; }
+
+        .m-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            outline: none;
+            font-size: 14px;
+            background: #f9f9f9;
+        }
+        
+        .m-input:focus {
+            background: #fff;
+            border-color: var(--primary-color);
+        }
+
+        /* --- 页面1：商品详情页 --- */
+        .goods-hero {
+            width: 100%;
+            /* height: 250px; */
+            aspect-ratio: 1 / 1; /* 设置为正方形 */
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            position: relative;
+        }
+
+        .goods-badge {
+            position: absolute;
+            bottom: 15px;
+            right: 15px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .goods-title {
+            font-size: 18px;
+            font-weight: bold;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .goods-subtitle {
+            font-size: 13px;
+            color: var(--danger-color);
+            margin-bottom: 10px;
+            line-height: 1.4;
+            background: #fff5f5;
+            display: inline-block;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .goods-meta {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-sub);
+            font-size: 12px;
+            margin-top: 10px;
+            border-top: 1px solid #f5f5f5;
+            padding-top: 10px;
+        }
+
+        .user-recommend {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .recommend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .recommend-item {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: #ddd;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .detail-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .detail-img-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #f0f0f0;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            border-radius: 4px;
+        }
+
+        /* 状态提示栏 */
+        .status-alert {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px 15px;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ffeeba;
+        }
+
+        /* 底部导航栏 */
+        .bottom-action-bar {
+            /* position: absolute; 移除 absolute */
+            /* bottom: 0; */
+            /* left: 0; */
+            /* right: 0; */
+            position: relative;
+            flex-shrink: 0; /* 防止被压缩 */
+            height: 55px;
+            background: #fff;
+            display: flex;
+            border-top: 1px solid #eee;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .nav-icon-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 10px;
+            color: #666;
+            cursor: pointer;
+        }
+        
+        .nav-icon-btn:active { background: #f9f9f9; }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .main-action-btn {
+            flex: 2.2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .main-action-btn.active {
+            background: var(--primary-color);
+        }
+
+        .main-action-btn.disabled {
+            background: #e0e0e0;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        /* --- 页面2：确认订单 --- */
+        .order-goods-info {
+            display: flex;
+            gap: 12px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .order-goods-img {
+            width: 70px;
+            height: 70px;
+            background: #eee;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* --- 页面3：成功页 --- */
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-color);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            color: #fff;
+            font-size: 50px;
+            line-height: 80px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .guess-like {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .like-item {
+            width: calc(50% - 5px);
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            padding-bottom: 10px;
+        }
+
+        /* 调试面板 */
+        #debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 9999;
+            max-width: 200px;
+        }
+        
+        #debug-panel h4 { margin: 0 0 5px 0; border-bottom: 1px solid #666; padding-bottom: 5px;}
+        #debug-panel label { display: block; margin: 5px 0; cursor: pointer; }
+
+        @media (max-width: 480px) {
+            body { background-color: #fff; }
+            #app-container { max-width: 100%; box-shadow: none; }
+            #debug-panel { top: 10px; bottom: auto; right: 10px; opacity: 0.8; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 主App容器 -->
+    <div id="app-container">
+        
+        <!-- 1. 商品详情页 -->
+        <div id="page-product" class="page active">
+            <!-- 顶部状态提示 (默认隐藏) -->
+            <div id="status-bar" class="status-alert">
+                ⏰ 兑换开始时间：2026-05-01 10:00
+            </div>
+
+            <div class="page-scroll-content">
+                <!-- 沉浸式头部，无NavBar -->
+                <div class="goods-hero">
+                    <span style="font-size: 24px;">📸 商品主图轮播</span>
+                    <div class="goods-badge">1/5</div>
+                </div>
+
+                <div class="m-card">
+                    <div class="goods-title">【尊享版】享乐派豪华礼包 | 特级茶叶+坚果礼盒+定制保温杯</div>
+                    <div class="goods-subtitle">企业定制首选 · 限量发售 · 包含精美礼品袋</div>
+                    <div class="goods-meta">
+                        <span>运费：包邮</span>
+                        <span>月销 1000+</span>
+                        <span>库存 500</span>
+                    </div>
+                </div>
+
+                <div class="m-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
+                        <span style="color:#999; width: 40px;">保障</span>
+                        <span style="flex:1;">正品保证 · 极速发货 · 7天无理由</span>
+                        <span style="color:#ccc;">></span>
+                    </div>
+                </div>
+
+                <div class="user-recommend">
+                    <div class="recommend-header">
+                        <h4 style="margin:0; font-size:15px;">用户推荐</h4>
+                        <span style="font-size:12px; color:#999;">查看全部 ></span>
+                    </div>
+                    <div class="recommend-item">
+                        <div class="avatar"></div>
+                        <div>
+                            <div style="margin-bottom:3px; font-weight:bold;">王先生</div>
+                            <div style="line-height:1.4;">包装非常精美，送礼很有面子，茶叶口感也不错！</div>
+                        </div>
+                    </div>
+                    <div class="recommend-item">
+                        <div class="avatar"></div>
+                        <div>
+                            <div style="margin-bottom:3px; font-weight:bold;">李女士</div>
+                            <div style="line-height:1.4;">兑换流程很顺畅，发货也快，五星好评。</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-card" style="margin-bottom: 0; min-height: 300px;">
+                    <h4 style="margin:0 0 15px 0; font-size:15px; border-left:4px solid var(--primary-color); padding-left:10px;">商品详情</h4>
+                    <div class="detail-content">
+                        <p>精选特级高山茶叶，香气浓郁，回甘悠长。产自核心产区，传统工艺制作。</p>
+                        <div class="detail-img-placeholder">商品详情图 1</div>
+                        <p>进口坚果礼盒，包含碧根果、夏威夷果、腰果等高品质坚果，营养美味，健康首选。</p>
+                        <div class="detail-img-placeholder">商品详情图 2</div>
+                        <p>定制304不锈钢保温杯，智能显温，长效保温。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-action-bar">
+                <div class="nav-icon-btn">
+                    <span class="nav-icon">🏠</span>
+                    <span>首页</span>
+                </div>
+                <div class="nav-icon-btn">
+                    <span class="nav-icon">🎧</span>
+                    <span>客服</span>
+                </div>
+                <!-- 动态按钮区域 -->
+                <div id="btn-action" class="main-action-btn active" onclick="handleRedeem()">
+                    立即兑换
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 确认订单页 -->
+        <div id="page-order" class="page">
+            <div class="nav-bar">
+                <div class="nav-back" onclick="goBack('page-product')">‹</div>
+                确认订单
+            </div>
+            
+            <div class="page-scroll-content" style="padding: 10px;">
+                <div class="m-card">
+                    <h4 style="margin:0 0 15px 0; font-size:15px;">商品信息</h4>
+                    <div class="order-goods-info">
+                        <div class="order-goods-img"></div>
+                        <div>
+                            <div style="font-weight:bold; font-size:14px; margin-bottom:5px; line-height:1.4;">【尊享版】享乐派豪华礼包</div>
+                            <div style="color:#999; font-size:12px; margin-bottom: 5px;">规格：默认 (特级茶叶+坚果礼盒...)</div>
+                            <div style="font-size:13px;">x 1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="m-card">
+                    <h4 style="margin:0 0 15px 0; font-size:15px;">收货人信息</h4>
+                    <input type="text" class="m-input" placeholder="请输入姓名" value="张三">
+                    <input type="tel" class="m-input" placeholder="请输入手机号" value="13800138000">
+                    
+                    <!-- 省市区选择 -->
+                    <div style="position:relative;">
+                        <input type="text" class="m-input" style="background:#fff;" readonly value="北京市 朝阳区" placeholder="请选择省/市/区">
+                        <span style="position:absolute; right:10px; top:12px; color:#999; pointer-events:none;">▼</span>
+                    </div>
+                    
+                    <textarea class="m-input" rows="2" placeholder="详细地址：街道门牌号" style="margin-bottom:0;">xx街道xx大厦B座1001</textarea>
+                </div>
+
+                <div class="m-card">
+                    <h4 style="margin:0 0 10px 0; font-size:15px;">备注信息</h4>
+                    <textarea class="m-input" rows="2" placeholder="如有特殊要求请留言（选填）" style="margin-bottom:0;"></textarea>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="m-btn" onclick="submitOrder()">提交订单</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 兑换成功页 -->
+        <div id="page-success" class="page">
+            <div class="nav-bar">
+                兑换结果
+            </div>
+            
+            <div class="page-scroll-content" style="padding: 40px 20px 20px; text-align: center;">
+                <div class="success-icon">✓</div>
+                <h2 style="margin:0 0 10px 0; font-size:22px;">兑换成功</h2>
+                <p style="color:#999; font-size:14px; margin-bottom:40px;">商家已收到您的订单，将尽快发货</p>
+                
+                <div style="display:flex; justify-content:center; gap:15px; margin-bottom:40px;">
+                    <button class="m-btn" style="background:#fff; border:1px solid #ddd; color:#666; width:auto; padding: 10px 30px;" onclick="alert('跳转订单详情')">查看订单</button>
+                    <button class="m-btn" style="width:auto; padding: 10px 30px;" onclick="goBack('page-product')">返回首页</button>
+                </div>
+
+                <!-- 猜你喜欢 -->
+                <div style="text-align:left;">
+                    <div style="text-align:center; margin-bottom:20px; color:var(--primary-color); font-weight:bold; position:relative;">
+                        <span style="background:var(--bg-color); padding:0 10px; position:relative; z-index:1;">❤ 猜你喜欢</span>
+                        <div style="position:absolute; top:50%; left:20%; right:20%; height:1px; background:#ddd; z-index:0;"></div>
+                    </div>
+                    <div class="guess-like">
+                        <div class="like-item">
+                            <div style="height:140px; background:#e0e0e0;"></div>
+                            <div style="padding:10px;">
+                                <div style="font-size:13px; margin-bottom:5px; font-weight:bold;">精选零食大礼包</div>
+                                <div style="color:var(--danger-color); font-size:12px;">热销推荐</div>
+                            </div>
+                        </div>
+                        <div class="like-item">
+                            <div style="height:140px; background:#e0e0e0;"></div>
+                            <div style="padding:10px;">
+                                <div style="font-size:13px; margin-bottom:5px; font-weight:bold;">高端定制马克杯</div>
+                                <div style="color:var(--danger-color); font-size:12px;">企业好礼</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 演示控制面板 -->
+    <div id="debug-panel">
+        <h4>演示场景切换</h4>
+        <label><input type="radio" name="scene" value="normal" checked onchange="switchScene(this.value)"> 正常兑换</label>
+        <label><input type="radio" name="scene" value="early" onchange="switchScene(this.value)"> 未到时间</label>
+        <label><input type="radio" name="scene" value="used" onchange="switchScene(this.value)"> 卡片已使用</label>
+    </div>
+
+    <script>
+        // 页面跳转逻辑
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function goBack(pageId) {
+            navigateTo(pageId);
+        }
+
+        // 场景状态
+        let currentScene = 'normal';
+
+        function switchScene(scene) {
+            currentScene = scene;
+            const btn = document.getElementById('btn-action');
+            const statusBar = document.getElementById('status-bar');
+            
+            // 重置状态
+            btn.className = 'main-action-btn';
+            btn.style.flexDirection = 'row'; // 重置布局方向
+            btn.style.lineHeight = 'normal'; // 重置行高
+            statusBar.style.display = 'none'; // 默认隐藏提示栏
+            
+            if (scene === 'normal') {
+                btn.classList.add('active');
+                btn.innerText = '立即兑换';
+            } else if (scene === 'early') {
+                btn.classList.add('disabled');
+                // 按钮显示两行：时间和说明
+                btn.style.flexDirection = 'column';
+                btn.style.lineHeight = '1.3';
+                btn.innerHTML = '<span style="font-size:15px">2026-05-01 10:00</span><span style="font-size:11px; opacity:0.8;">开始兑换</span>';
+                
+                // 既然按钮上已经显示了时间，顶部提示栏可以选择隐藏，或者保留作为强调。
+                // 根据用户指令“按钮展示内容调整为...”，重点在按钮。这里选择隐藏顶部栏以避免冗余。
+                statusBar.style.display = 'none'; 
+            } else if (scene === 'used') {
+                btn.classList.add('disabled');
+                btn.innerText = '卡片已使用';
+            }
+            
+            // 如果不在首页，强制回到首页
+            navigateTo('page-product');
+        }
+
+        // 业务逻辑
+        function handleRedeem() {
+            if (currentScene !== 'normal') {
+                return; // 禁用状态下不可点击
+            }
+            // 跳转到订单页
+            navigateTo('page-order');
+        }
+
+        function submitOrder() {
+            // 简单验证
+            // 跳转成功页
+            navigateTo('page-success');
+        }
+
+        // 初始化
+        switchScene('normal');
+
+    </script>
+</body>
+</html>
