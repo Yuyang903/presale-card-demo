@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预售卡系统 - 数据库设计建议 (DB Schema)</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --bg-color: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-color: #333;
+            --header-bg: #fff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            color: var(--secondary-color);
+            border-left: 5px solid var(--primary-color);
+            padding-left: 15px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            color: #555;
+            border-bottom: 1px dashed #ddd;
+            padding-bottom: 10px;
+        }
+
+        h4 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #444;
+            background: #f1f8ff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 30px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--secondary-color);
+            width: 200px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: Consolas, monospace;
+            color: #c7254e;
+        }
+
+        .note {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ffeeba;
+            margin: 20px 0;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="nav-link">← 返回原型首页</a>
+    
+    <h1>预售卡兑换系统 - 数据库设计建议方案 (V1.0)</h1>
+
+    <div class="note">
+        <strong>设计概述：</strong><br>
+        本方案基于 PRD V1.0 及原型开发，支持“商品卡”与“积分卡”双轨业务模式。核心设计原则为安全性（Token机制）、扩展性及数据完整性。
+    </div>
+
+    <h2>1. 实体关系 (ER Diagram)</h2>
+    <ul>
+        <li><strong>分发商 (Distributor)</strong> 1 : N <strong>批次 (Batch)</strong></li>
+        <li><strong>批次 (Batch)</strong> 1 : N <strong>卡片 (Card)</strong></li>
+        <li><strong>批次 (Batch)</strong> N : N <strong>商品 (Product)</strong> (仅商品卡类型)</li>
+        <li><strong>卡片 (Card)</strong> 1 : N <strong>订单 (Order)</strong> (积分卡支持多次兑换)</li>
+        <li><strong>订单 (Order)</strong> 1 : N <strong>订单明细 (OrderItem)</strong></li>
+    </ul>
+
+    <h2>2. 数据表结构设计</h2>
+
+    <h3>2.1 基础模块</h3>
+
+    <h4>sys_users (系统用户表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>username</td><td>VARCHAR(50)</td><td>用户名</td></tr>
+        <tr><td>password_hash</td><td>VARCHAR(255)</td><td>密码哈希</td></tr>
+        <tr><td>role</td><td>VARCHAR(20)</td><td>角色 (admin:管理员, operator:运营)</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    </table>
+
+    <h4>distributors (分发商表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>name</td><td>VARCHAR(100)</td><td>分发商名称</td></tr>
+        <tr><td>contact_person</td><td>VARCHAR(50)</td><td>联系人</td></tr>
+        <tr><td>phone</td><td>VARCHAR(20)</td><td>联系电话</td></tr>
+        <tr><td>address</td><td>VARCHAR(255)</td><td>地址</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (1:合作中, 0:停用)</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    </table>
+
+    <h4>products (商品表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>name</td><td>VARCHAR(100)</td><td>商品名称</td></tr>
+        <tr><td>description</td><td>TEXT</td><td>商品详情描述 (HTML)</td></tr>
+        <tr><td>image_urls</td><td>TEXT</td><td>商品图片 (JSON数组)</td></tr>
+        <tr><td>stock</td><td>INT</td><td>库存数量</td></tr>
+        <tr><td>points_price</td><td>INT</td><td>积分兑换价 (积分商城用)</td></tr>
+        <tr><td>category</td><td>VARCHAR(50)</td><td>分类 (如: 数码, 食品)</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (1:上架, 0:下架)</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    </table>
+
+    <h3>2.2 卡务核心模块</h3>
+
+    <h4>card_batches (制卡批次表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>batch_no</td><td>VARCHAR(50)</td><td>批次号 (唯一)</td></tr>
+        <tr><td>name</td><td>VARCHAR(100)</td><td>批次名称</td></tr>
+        <tr><td>type</td><td>TINYINT</td><td>卡类型 (1:商品卡, 2:积分卡)</td></tr>
+        <tr><td>distributor_id</td><td>INT</td><td>关联分发商ID</td></tr>
+        <tr><td>discount_rate</td><td>DECIMAL(5,2)</td><td>结算折扣率 (如 0.70)</td></tr>
+        <tr><td>points_value</td><td>INT</td><td>面额积分 (仅积分卡有效)</td></tr>
+        <tr><td>total_count</td><td>INT</td><td>制卡总数</td></tr>
+        <tr><td>start_time</td><td>DATETIME</td><td>兑换开始时间</td></tr>
+        <tr><td>delivery_estimate</td><td>VARCHAR(100)</td><td>预计发货时间描述</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (0:未激活, 1:已激活, 2:已作废)</td></tr>
+        <tr><td>remark</td><td>TEXT</td><td>内部备注</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    </table>
+
+    <h4>batch_products (批次-商品关联表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>batch_id</td><td>INT</td><td>批次ID</td></tr>
+        <tr><td>product_id</td><td>INT</td><td>商品ID</td></tr>
+    </table>
+
+    <h4>cards (卡片明细表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>card_no</td><td>VARCHAR(50)</td><td>卡号 (对外展示, 唯一)</td></tr>
+        <tr><td>token</td><td>VARCHAR(64)</td><td>兑换Token (URL参数, 核心凭证, 索引)</td></tr>
+        <tr><td>batch_id</td><td>INT</td><td>所属批次ID</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (0:未激活, 1:已激活, 2:已使用, 3:已作废)</td></tr>
+        <tr><td>points_balance</td><td>INT</td><td>剩余积分 (积分卡用)</td></tr>
+        <tr><td>activated_at</td><td>DATETIME</td><td>激活时间</td></tr>
+        <tr><td>first_used_at</td><td>DATETIME</td><td>首次使用时间</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>生成时间</td></tr>
+    </table>
+
+    <h3>2.3 订单与履约模块</h3>
+
+    <h4>orders (兑换订单表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>order_no</td><td>VARCHAR(50)</td><td>订单号 (唯一)</td></tr>
+        <tr><td>card_id</td><td>INT</td><td>关联卡片ID</td></tr>
+        <tr><td>user_name</td><td>VARCHAR(50)</td><td>收货人姓名</td></tr>
+        <tr><td>user_phone</td><td>VARCHAR(20)</td><td>收货人电话</td></tr>
+        <tr><td>user_address</td><td>TEXT</td><td>完整收货地址</td></tr>
+        <tr><td>total_points</td><td>INT</td><td>消耗积分总额 (积分卡订单用)</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (0:待发货, 1:已发货, 2:已完成)</td></tr>
+        <tr><td>tracking_company</td><td>VARCHAR(50)</td><td>物流公司</td></tr>
+        <tr><td>tracking_no</td><td>VARCHAR(50)</td><td>物流单号</td></tr>
+        <tr><td>shipped_at</td><td>DATETIME</td><td>发货时间</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>下单时间</td></tr>
+    </table>
+
+    <h4>order_items (订单商品明细表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>order_id</td><td>INT</td><td>订单ID</td></tr>
+        <tr><td>product_id</td><td>INT</td><td>商品ID</td></tr>
+        <tr><td>product_name</td><td>VARCHAR(100)</td><td>商品名称快照</td></tr>
+        <tr><td>quantity</td><td>INT</td><td>数量</td></tr>
+        <tr><td>settlement_price</td><td>DECIMAL(10,2)</td><td>结算单价快照 (根据批次折扣计算)</td></tr>
+    </table>
+
+    <h3>2.4 财务模块</h3>
+
+    <h4>finance_records (财务流水表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>type</td><td>TINYINT</td><td>类型 (1:制卡成本, 2:售卡收入)</td></tr>
+        <tr><td>batch_id</td><td>INT</td><td>关联批次ID (可选)</td></tr>
+        <tr><td>amount</td><td>DECIMAL(10,2)</td><td>金额</td></tr>
+        <tr><td>related_party</td><td>VARCHAR(100)</td><td>相关方 (供应商/客户)</td></tr>
+        <tr><td>record_date</td><td>DATE</td><td>业务发生日期</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>登记时间</td></tr>
+    </table>
+
+    <h4>settlements (结算单表)</h4>
+    <table>
+        <tr><th>字段名</th><th>类型</th><th>说明</th></tr>
+        <tr><td>id</td><td>INT</td><td>主键, 自增</td></tr>
+        <tr><td>settlement_no</td><td>VARCHAR(50)</td><td>结算单号</td></tr>
+        <tr><td>distributor_id</td><td>INT</td><td>分发商ID</td></tr>
+        <tr><td>amount</td><td>DECIMAL(10,2)</td><td>结算总金额</td></tr>
+        <tr><td>status</td><td>TINYINT</td><td>状态 (0:未结算, 1:已结算)</td></tr>
+        <tr><td>period</td><td>VARCHAR(20)</td><td>账期 (如 2023-10)</td></tr>
+        <tr><td>created_at</td><td>DATETIME</td><td>创建时间</td></tr>
+    </table>
+
+    <h2>3. 关键索引建议</h2>
+    <ul>
+        <li><code>cards</code> 表：<code>UNIQUE INDEX idx_card_token (token)</code> - 确保兑换链接唯一且查询高性能。</li>
+        <li><code>cards</code> 表：<code>INDEX idx_card_no (card_no)</code> - 后台管理查询使用。</li>
+        <li><code>orders</code> 表：<code>UNIQUE INDEX idx_order_no (order_no)</code> - 订单唯一性。</li>
+        <li><code>orders</code> 表：<code>INDEX idx_card_id (card_id)</code> - 查询卡片历史兑换记录。</li>
+    </ul>
+
+    <h2>4. 补充说明</h2>
+    <ul>
+        <li><strong>积分扣减</strong>：对于积分卡，建议采用乐观锁（Optimistic Locking）或数据库事务处理 <code>points_balance</code> 的扣减，防止并发超额兑换。</li>
+        <li><strong>状态审计</strong>：卡片状态变更（如作废、激活）建议增加 <code>card_logs</code> 表进行日志记录，以便审计追踪。</li>
+    </ul>
+
+</div>
+
+</body>
+</html>
