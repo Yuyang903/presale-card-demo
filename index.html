@@ -1112,11 +1112,32 @@
                 <div class="form-group">
                     <label>增加卡片数量 (张)</label>
                     <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="number" id="edit-add-quantity" class="form-control" value="0" min="0" placeholder="0">
+                        <input type="number" id="edit-add-quantity" class="form-control" value="0" min="0" placeholder="0" oninput="handleEditQtyChange()">
                         <span style="font-size:12px; color:#666;">(仅允许增加，不可减少)</span>
                     </div>
                     <div style="font-size:12px; color:#e67e22; margin-top:5px;">
                         * 新增卡片将自动继承当前批次的激活状态。
+                    </div>
+                </div>
+                
+                <!-- 新增卡号设置 (动态显示) -->
+                <div class="form-group" id="edit-card-no-group" style="display:none; background:#f9f9f9; padding:10px; border-radius:4px; margin-bottom: 15px;">
+                    <label style="font-size:12px; margin-bottom:5px;">新增卡号规则</label>
+                    <div style="margin-bottom:5px;">
+                        <label style="font-weight:normal; margin-right:15px; font-size:13px; cursor:pointer;">
+                            <input type="radio" name="editCardNoMode" value="auto" checked onclick="toggleEditCardMode(this.value)"> 顺延 (系统生成)
+                        </label>
+                        <label style="font-weight:normal; font-size:13px; cursor:pointer;">
+                            <input type="radio" name="editCardNoMode" value="custom" onclick="toggleEditCardMode(this.value)"> 自定义起始号
+                        </label>
+                    </div>
+                    <div id="editCardNoRangeBox" style="display:none; margin-top:5px; align-items:center;">
+                        <span style="color:#666; font-size:12px; margin-right:5px;">起始号 NO.</span>
+                        <input type="number" id="editStartCardNo" class="form-control" style="width:100px; padding:2px 5px; height:28px; display:inline-block;" placeholder="1" oninput="calcEditCardRange()">
+                        <span style="margin:0 5px; color:#999; font-size:12px;">至 NO.<span id="editEndCardNo">--</span></span>
+                    </div>
+                    <div id="editCardNoAutoTip" style="font-size:12px; color:#666; margin-top:5px;">
+                        预计卡号段：<span id="editAutoRange">--</span>
                     </div>
                 </div>
                 <div class="form-group">
