@@ -66,7 +66,8 @@
         <div id="admin-view" class="view-section active">
             <div class="admin-layout">
                 <div class="admin-sidebar">
-                    <div class="admin-menu-item active" onclick="switchAdminTab('card', event)">卡片管理</div>
+                    <div class="admin-menu-item active" onclick="switchAdminTab('card-product', event)">商品兑换卡</div>
+                    <div class="admin-menu-item" onclick="switchAdminTab('card-points', event)">积分礼品卡</div>
                     <div class="admin-menu-item" onclick="switchAdminTab('distributor', event)">分发商管理</div>
                     <div class="admin-menu-item" onclick="switchAdminTab('order', event)">订单管理</div>
                     <div class="admin-menu-item" onclick="switchAdminTab('finance', event)">财务管理</div>
@@ -75,15 +76,15 @@
                 
                 <div class="admin-content">
                     
-                    <!-- 卡片管理模块 -->
-                    <div id="tab-card" class="admin-module">
+                    <!-- 商品兑换卡管理模块 -->
+                    <div id="tab-card-product" class="admin-module">
                         
                         <!-- 卡片列表视图 -->
-                        <div id="card-list-view">
+                        <div id="card-list-view-product">
                             <div class="admin-header-bar">
-                                <div class="admin-title">卡片管理</div>
+                                <div class="admin-title">商品兑换卡管理</div>
                                 <div>
-                                    <button class="btn btn-success" onclick="openModal('createCardModal')">+ 新增制卡</button>
+                                    <button class="btn btn-success" onclick="openCreateCardModal('product')">+ 新增制卡</button>
                                     <button class="btn btn-warning" onclick="alert('功能仅演示')">批量激活</button>
                                     <button class="btn btn-outline" onclick="alert('功能仅演示')">导出数据</button>
                                 </div>
@@ -133,7 +134,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr data-total="200" data-remark="未激活测试批次">
+                                        <tr data-total="200" data-remark="未激活测试批次" data-type="product">
                                             <td><input type="checkbox"></td>
                                             <td>中秋礼品卡_批次A</td>
                                             <td><span class="tag p2">商品卡</span></td>
@@ -151,26 +152,7 @@
                                                 <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td><input type="checkbox"></td>
-                                            <td>企业积分卡_批次C</td>
-                                            <td><span class="tag" style="background:#9b59b6;">积分卡</span></td>
-                                            <td>分发商A (7折)</td>
-                                            <td>300 积分</td>
-                                            <td>1000</td>
-                                            <td style="font-size:12px; line-height:1.4;">
-                                                <div style="color:#999;">生成：2023-11-01</div>
-                                                <div style="color:#27ae60;">发货：2023-11-05</div>
-                                            </td>
-                                            <td><span class="tag p1">已激活</span></td>
-                                            <td>
-                                                <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
-                                                <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
-                                                <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
-                                                <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
-                                            </td>
-                                        </tr>
-                                        <tr>
+                                        <tr data-type="product">
                                             <td><input type="checkbox"></td>
                                             <td>国庆福利卡_批次B</td>
                                             <td><span class="tag p2">商品卡</span></td>
@@ -190,7 +172,7 @@
                                                 <button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>
                                             </td>
                                         </tr>
-                                        <tr data-total="1000" data-remark="操作失误作废">
+                                        <tr data-total="1000" data-remark="操作失误作废" data-type="product">
                                             <td><input type="checkbox"></td>
                                             <td>春节预售卡_批次C</td>
                                             <td><span class="tag p2">商品卡</span></td>
@@ -214,11 +196,11 @@
                         </div>
                         
                         <!-- 批次详情视图 (默认隐藏) -->
-                        <div id="card-detail-view" style="display:none;">
+                        <div id="card-detail-view-product" style="display:none;">
                             <div class="admin-header-bar">
                                 <div style="display:flex; align-items:center; gap:10px;">
-                                    <button class="btn btn-outline" onclick="hideBatchDetail()">← 返回</button>
-                                    <div class="admin-title" id="detail-batch-name">批次详情：中秋礼品卡_批次A</div>
+                                    <button class="btn btn-outline" onclick="hideBatchDetail('product')">← 返回</button>
+                                    <div class="admin-title" id="detail-batch-name-product">批次详情</div>
                                 </div>
                                 <div>
                                     <button class="btn btn-primary" onclick="alert('功能仅演示')">导出卡密</button>
@@ -229,19 +211,19 @@
                             <div style="display:flex; gap:20px; margin-bottom:20px;">
                                 <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
                                     <div style="color:#666; font-size:14px;">总卡量</div>
-                                    <div style="font-size:24px; font-weight:bold; color:var(--primary-color);" id="detail-total-count">500</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--primary-color);" id="detail-total-count-product">500</div>
                                 </div>
                                 <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
                                     <div style="color:#666; font-size:14px;">已激活</div>
-                                    <div style="font-size:24px; font-weight:bold; color:var(--success-color);" id="detail-activated-count">450</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--success-color);" id="detail-activated-count-product">450</div>
                                 </div>
                                 <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
                                     <div style="color:#666; font-size:14px;">已使用</div>
-                                    <div style="font-size:24px; font-weight:bold; color:var(--warning-color);" id="detail-used-count">120</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--warning-color);" id="detail-used-count-product">120</div>
                                 </div>
                                 <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
                                     <div style="color:#666; font-size:14px;">已作废</div>
-                                    <div style="font-size:24px; font-weight:bold; color:var(--danger-color);" id="detail-void-count">5</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--danger-color);" id="detail-void-count-product">5</div>
                                 </div>
                             </div>
 
@@ -313,6 +295,159 @@
 
                     </div>
 
+                    <!-- 积分礼品卡管理模块 -->
+                    <div id="tab-card-points" class="admin-module" style="display:none;">
+                        
+                        <!-- 卡片列表视图 -->
+                        <div id="card-list-view-points">
+                            <div class="admin-header-bar">
+                                <div class="admin-title">积分礼品卡管理</div>
+                                <div>
+                                    <button class="btn btn-success" onclick="openCreateCardModal('points')">+ 新增制卡</button>
+                                    <button class="btn btn-warning" onclick="alert('功能仅演示')">批量激活</button>
+                                    <button class="btn btn-outline" onclick="alert('功能仅演示')">导出数据</button>
+                                </div>
+                            </div>
+
+                             <!-- 流程指引 -->
+                            <div style="margin-bottom: 15px; padding: 10px; background: #f0f7ff; border: 1px solid #cce5ff; border-radius: 4px; font-size: 12px; color: #004085; display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
+                                <strong>业务流程：</strong>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">1. 制卡 (未激活)</span>
+                                <span style="color:#666;">→</span>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">2. 关联商品池</span>
+                                <span style="color:#666;">→</span>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">3. 导出数据 & 生产</span>
+                                <span style="color:#666;">→</span>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">4. 激活批次</span>
+                                <span style="color:#666;">→</span>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">5. 分发</span>
+                                <span style="color:#666;">→</span>
+                                <span style="background:#fff; padding:2px 6px; border-radius:3px; border:1px solid #b8daff;">6. 用户兑换</span>
+                            </div>
+
+                            <div class="filter-bar">
+                                <input type="text" class="form-control" placeholder="批次名称" style="width: 200px;">
+                                <input type="number" class="form-control" placeholder="面额" style="width: 200px;">
+                                <select class="form-control">
+                                    <option>所有状态</option>
+                                    <option>未激活</option>
+                                    <option>已激活</option>
+                                    <option>已作废</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="alert('功能仅演示')">查询</button>
+                            </div>
+
+                            <div class="admin-card">
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="40"><input type="checkbox"></th>
+                                            <th>批次名称</th>
+                                            <th>类型</th>
+                                            <th>分发商</th>
+                                            <th>内容/面额</th>
+                                            <th>卡片总数</th>
+                                            <th width="180">时间信息</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-type="points">
+                                            <td><input type="checkbox"></td>
+                                            <td>企业积分卡_批次C</td>
+                                            <td><span class="tag" style="background:#9b59b6;">积分卡</span></td>
+                                            <td>分发商A (7折)</td>
+                                            <td>300 积分</td>
+                                            <td>1000</td>
+                                            <td style="font-size:12px; line-height:1.4;">
+                                                <div style="color:#999;">生成：2023-11-01</div>
+                                                <div style="color:#27ae60;">发货：2023-11-05</div>
+                                            </td>
+                                            <td><span class="tag p1">已激活</span></td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
+                                                <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
+                                                <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
+                                                <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- 批次详情视图 (默认隐藏) -->
+                        <div id="card-detail-view-points" style="display:none;">
+                            <div class="admin-header-bar">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <button class="btn btn-outline" onclick="hideBatchDetail('points')">← 返回</button>
+                                    <div class="admin-title" id="detail-batch-name-points">批次详情</div>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary" onclick="alert('功能仅演示')">导出卡密</button>
+                                </div>
+                            </div>
+
+                            <!-- 概览数据卡片 -->
+                            <div style="display:flex; gap:20px; margin-bottom:20px;">
+                                <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
+                                    <div style="color:#666; font-size:14px;">总卡量</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--primary-color);" id="detail-total-count-points">0</div>
+                                </div>
+                                <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
+                                    <div style="color:#666; font-size:14px;">已激活</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--success-color);" id="detail-activated-count-points">0</div>
+                                </div>
+                                <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
+                                    <div style="color:#666; font-size:14px;">已使用</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--warning-color);" id="detail-used-count-points">0</div>
+                                </div>
+                                <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
+                                    <div style="color:#666; font-size:14px;">已作废</div>
+                                    <div style="font-size:24px; font-weight:bold; color:var(--danger-color);" id="detail-void-count-points">0</div>
+                                </div>
+                            </div>
+
+                            <div class="admin-card">
+                                <div style="margin-bottom:15px; font-weight:bold; border-bottom:1px solid #eee; padding-bottom:10px;">本批次卡片列表</div>
+                                <div class="filter-bar" style="margin-bottom:15px; padding:10px;">
+                                    <input type="text" class="form-control" placeholder="搜索卡号" style="width: 200px;">
+                                    <select class="form-control">
+                                        <option>状态筛选</option>
+                                        <option>未激活</option>
+                                        <option>已激活</option>
+                                        <option>已使用</option>
+                                    </select>
+                                    <button class="btn btn-primary btn-sm">搜索</button>
+                                    <button class="btn btn-outline btn-sm">导出Excel</button>
+                                </div>
+                                <table class="admin-table">
+                                    <thead>
+                                        <tr>
+                                            <th>卡号</th>
+                                            <th>兑换链接</th>
+                                            <th>状态</th>
+                                            <th>生成时间</th>
+                                            <th>兑换时间</th>
+                                            <th>订单号</th>
+                                            <th>内容</th>
+                                            <th>发货状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Placeholder for points card details -->
+                                        <tr>
+                                            <td colspan="9" style="text-align:center; padding:20px; color:#999;">暂无数据 (演示)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
                     <!-- 分发商管理模块 -->
                     <div id="tab-distributor" class="admin-module" style="display:none;">
                         <div class="admin-header-bar">
@@ -366,8 +501,8 @@
                         
                         <!-- 订单类型Tab -->
                         <div style="display:flex; gap:30px; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-                            <div id="ot-presale" class="order-tab active" onclick="switchOrderTab('presale')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">预售卡兑换订单</div>
-                            <div id="ot-gift" class="order-tab" onclick="switchOrderTab('gift')" style="color:#666; cursor:pointer; padding-bottom:5px;">礼品卡商城订单</div>
+                            <div id="ot-presale" class="order-tab active" onclick="switchOrderTab('presale')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">商品兑换卡订单</div>
+                            <div id="ot-gift" class="order-tab" onclick="switchOrderTab('gift')" style="color:#666; cursor:pointer; padding-bottom:5px;">积分礼品卡订单</div>
                         </div>
 
                         <!-- 1. 预售卡订单视图 -->
