@@ -416,6 +416,182 @@
             flex-shrink: 0;
         }
 
+        /* 新增：地址卡片样式 */
+        .address-card {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        
+        .address-content {
+            flex: 1;
+            padding-right: 10px;
+        }
+
+        .address-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .address-arrow {
+            color: #ccc;
+            font-size: 20px;
+        }
+
+        .address-user {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .address-detail {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .address-tag-default {
+            background: var(--danger-color);
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: normal;
+        }
+
+        /* 新增：地址编辑页样式 */
+        .form-row {
+            background: #fff;
+            padding: 15px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-label {
+            width: 80px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .form-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .smart-parse-area {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .smart-parse-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            font-size: 12px;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+        /* 开关控件 */
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .switch-toggle {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        .switch-toggle input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* 地址列表项 */
+        .address-list-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 1px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .address-select-radio {
+            margin-right: 15px;
+            color: var(--success-color);
+            font-size: 20px;
+            opacity: 0; /* 默认隐藏，选中显示 */
+        }
+        
+        .address-list-item.selected .address-select-radio {
+            opacity: 1;
+        }
+
         /* --- 页面3：成功页 --- */
         .success-icon {
             width: 80px;
@@ -641,6 +817,14 @@
             </div>
             
             <div class="page-scroll-content" style="padding: 10px;">
+                <!-- 顶部收货人信息模块 -->
+                <div id="order-address-container" onclick="selectAddress()">
+                    <!-- JS 动态渲染 -->
+                    <div class="address-card" style="justify-content: center; padding: 25px; color: var(--primary-color);">
+                        + 添加收货地址
+                    </div>
+                </div>
+
                 <div class="m-card">
                     <h4 style="margin:0 0 15px 0; font-size:15px;">商品信息</h4>
                     <div class="order-goods-info">
@@ -654,26 +838,69 @@
                 </div>
 
                 <div class="m-card">
-                    <h4 style="margin:0 0 15px 0; font-size:15px;">收货人信息</h4>
-                    <input type="text" class="m-input" placeholder="请输入姓名" value="张三">
-                    <input type="tel" class="m-input" placeholder="请输入手机号" value="13800138000">
-                    
-                    <!-- 省市区选择 -->
-                    <div style="position:relative;">
-                        <input type="text" class="m-input" style="background:#fff;" readonly value="北京市 朝阳区" placeholder="请选择省/市/区">
-                        <span style="position:absolute; right:10px; top:12px; color:#999; pointer-events:none;">▼</span>
-                    </div>
-                    
-                    <textarea class="m-input" rows="2" placeholder="详细地址：街道门牌号" style="margin-bottom:0;">xx街道xx大厦B座1001</textarea>
-                </div>
-
-                <div class="m-card">
                     <h4 style="margin:0 0 10px 0; font-size:15px;">备注信息</h4>
                     <textarea class="m-input" rows="2" placeholder="如有特殊要求请留言（选填）" style="margin-bottom:0;"></textarea>
                 </div>
 
                 <div style="margin-top: 20px;">
                     <button class="m-btn" onclick="submitOrder()">提交订单</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2.1 地址列表页 -->
+        <div id="page-address-list" class="page">
+            <div class="nav-bar">
+                <div class="nav-back" onclick="goBack('page-order')">‹</div>
+                选择收货地址
+            </div>
+            <div class="page-scroll-content" id="address-list-container" style="padding-bottom: 80px;">
+                <!-- JS 渲染列表 -->
+            </div>
+            <div style="position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background: #fff; border-top: 1px solid #eee;">
+                <button class="m-btn" onclick="addAddress()">+ 新增收货地址</button>
+            </div>
+        </div>
+
+        <!-- 2.2 新增/编辑地址页 -->
+        <div id="page-address-edit" class="page">
+            <div class="nav-bar">
+                <div class="nav-back" onclick="goBack('page-address-list')">‹</div>
+                添加收货地址
+            </div>
+            <div class="page-scroll-content">
+                <div class="smart-parse-area">
+                    <textarea id="smart-text" class="m-input" rows="3" placeholder="粘贴地址信息，自动拆分姓名、电话和地址" style="margin-bottom:0; font-size:13px;"></textarea>
+                    <div class="smart-parse-btn" onclick="smartParse()">智能填写</div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-label">收货人</div>
+                    <input type="text" id="addr-name" class="form-input" placeholder="请填写收货人姓名">
+                </div>
+                <div class="form-row">
+                    <div class="form-label">手机号码</div>
+                    <input type="tel" id="addr-phone" class="form-input" placeholder="请填写收货人手机号">
+                </div>
+                <div class="form-row">
+                    <div class="form-label">所在地区</div>
+                    <input type="text" id="addr-region" class="form-input" placeholder="省市区县、乡镇等" readonly onclick="alert('地区选择器（演示）')">
+                </div>
+                <div class="form-row">
+                    <div class="form-label">详细地址</div>
+                    <textarea id="addr-detail" class="form-input" rows="2" placeholder="街道、楼牌号等" style="resize:none; font-family:inherit;"></textarea>
+                </div>
+
+                <div class="switch-row">
+                    <div style="font-size:14px;">设为默认地址</div>
+                    <label class="switch-toggle">
+                        <input type="checkbox" id="addr-default">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin: 30px 15px;">
+                    <button class="m-btn" onclick="saveAddress()">保存</button>
                 </div>
             </div>
         </div>
@@ -691,7 +918,7 @@
                 
                 <div style="display:flex; justify-content:center; gap:15px; margin-bottom:40px;">
                     <button class="m-btn" style="background:#fff; border:1px solid #ddd; color:#666; width:auto; padding: 10px 30px;" onclick="alert('跳转订单详情')">查看订单</button>
-                    <button class="m-btn" style="width:auto; padding: 10px 30px;" onclick="goBack('home')">返回首页</button>
+                    <button class="m-btn" style="width:auto; padding: 10px 30px;" onclick="goBack('page-product')">返回首页</button>
                 </div>
 
                 <!-- 猜你喜欢 -->
@@ -758,6 +985,13 @@
         // 全局状态
         let currentCardType = 'product'; // product | points
         let currentScene = 'normal';
+        
+        // 地址数据
+        let addressList = [
+            { id: 1, name: '张三', phone: '13800138000', region: '北京市 朝阳区', detail: 'xx街道xx大厦B座1001', isDefault: true },
+            { id: 2, name: '李四', phone: '13900000000', region: '上海市 浦东新区', detail: '张江高科园区xx路xx号', isDefault: false }
+        ];
+        let currentAddress = null; // 当前选中地址
 
         // 切换卡片类型
         function switchCardType(type) {
@@ -773,6 +1007,10 @@
             // 重置场景为正常
             document.querySelector('input[name="scene"][value="normal"]').checked = true;
             switchScene('normal');
+            
+            // 重置地址选中状态 (可选)
+            // currentAddress = null;
+            // renderAddressCard();
         }
 
         // 切换场景状态
@@ -852,11 +1090,14 @@
             
             // 设置订单页信息为商品卡模式
             updateOrderPage({
-                img: '', // 使用默认占位
+                img: '', 
                 title: '【尊享版】享乐派豪华礼包',
                 desc: '规格：默认 (特级茶叶+坚果礼盒...)',
                 price: 'x 1'
             });
+            
+            // 初始化默认地址
+            initDefaultAddress();
             
             navigateTo('page-order');
         }
@@ -878,6 +1119,9 @@
                 price: `消耗: <span style="color:var(--warning-color); font-weight:bold;">${points}</span>`
             });
             
+            // 初始化默认地址
+            initDefaultAddress();
+
             navigateTo('page-order');
         }
 
@@ -891,6 +1135,148 @@
                     <div style="font-size:13px;">${info.price}</div>
                 </div>
             `;
+        }
+
+        // --- 地址管理逻辑 ---
+
+        function initDefaultAddress() {
+            if (!currentAddress && addressList.length > 0) {
+                currentAddress = addressList.find(a => a.isDefault) || addressList[0];
+            }
+            renderAddressCard();
+        }
+
+        function renderAddressCard() {
+            const container = document.getElementById('order-address-container');
+            if (currentAddress) {
+                container.innerHTML = `
+                    <div class="address-card">
+                        <div class="address-icon">📍</div>
+                        <div class="address-content">
+                            <div class="address-user">
+                                ${currentAddress.name} ${currentAddress.phone}
+                                ${currentAddress.isDefault ? '<span class="address-tag-default">默认</span>' : ''}
+                            </div>
+                            <div class="address-detail">${currentAddress.region} ${currentAddress.detail}</div>
+                        </div>
+                        <div class="address-arrow">›</div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="address-card" style="justify-content: center; padding: 25px; color: var(--primary-color);">
+                        + 添加收货地址
+                    </div>
+                `;
+            }
+        }
+
+        function selectAddress() {
+            renderAddressList();
+            navigateTo('page-address-list');
+        }
+
+        function renderAddressList() {
+            const container = document.getElementById('address-list-container');
+            let html = '';
+            addressList.forEach((addr, index) => {
+                const isSelected = currentAddress && currentAddress.id === addr.id;
+                html += `
+                    <div class="address-list-item ${isSelected ? 'selected' : ''}" onclick="selectAddressItem(${index})">
+                        <div class="address-select-radio">✓</div>
+                        <div style="flex:1">
+                            <div style="font-weight:bold; font-size:15px; margin-bottom:5px;">
+                                ${addr.name} <span style="font-weight:normal; color:#666; margin-left:5px;">${addr.phone}</span>
+                                ${addr.isDefault ? '<span class="address-tag-default">默认</span>' : ''}
+                            </div>
+                            <div style="font-size:13px; color:#666;">${addr.region} ${addr.detail}</div>
+                        </div>
+                        <div style="color:#ccc; padding:10px;" onclick="event.stopPropagation(); alert('编辑地址（演示）')">✎</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function selectAddressItem(index) {
+            currentAddress = addressList[index];
+            renderAddressCard();
+            goBack('page-order');
+        }
+
+        function addAddress() {
+            // 清空表单
+            document.getElementById('addr-name').value = '';
+            document.getElementById('addr-phone').value = '';
+            document.getElementById('addr-region').value = '';
+            document.getElementById('addr-detail').value = '';
+            document.getElementById('addr-default').checked = false;
+            document.getElementById('smart-text').value = '';
+            
+            navigateTo('page-address-edit');
+        }
+
+        function saveAddress() {
+            const name = document.getElementById('addr-name').value;
+            const phone = document.getElementById('addr-phone').value;
+            const region = document.getElementById('addr-region').value;
+            const detail = document.getElementById('addr-detail').value;
+            const isDefault = document.getElementById('addr-default').checked;
+
+            if (!name || !phone || !detail) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            const newAddr = {
+                id: Date.now(),
+                name,
+                phone,
+                region: region || '北京市 朝阳区', // 默认值
+                detail,
+                isDefault
+            };
+
+            if (isDefault) {
+                addressList.forEach(a => a.isDefault = false);
+            }
+
+            addressList.unshift(newAddr); // 添加到顶部
+            currentAddress = newAddr; // 自动选中
+            
+            renderAddressCard();
+            // 直接返回订单页，跳过列表页
+            navigateTo('page-order');
+        }
+
+        function smartParse() {
+            const text = document.getElementById('smart-text').value;
+            if (!text) return;
+            
+            // 简单模拟智能识别
+            // 假设格式：姓名 手机号 地址
+            // 或者：地址 姓名 手机号
+            
+            // 提取手机号
+            const phoneMatch = text.match(/1\d{10}/);
+            if (phoneMatch) {
+                document.getElementById('addr-phone').value = phoneMatch[0];
+            }
+            
+            // 简单的名字和地址填充（实际需要复杂算法）
+            const parts = text.split(/[\s，,]+/).filter(p => p && !/1\d{10}/.test(p));
+            if (parts.length > 0) {
+                if (parts[0].length <= 4) {
+                    document.getElementById('addr-name').value = parts[0];
+                    if (parts.length > 1) document.getElementById('addr-detail').value = parts.slice(1).join('');
+                } else {
+                    document.getElementById('addr-detail').value = parts.join('');
+                    document.getElementById('addr-name').value = '自动识别';
+                }
+            }
+            
+            // 模拟地区
+            document.getElementById('addr-region').value = '浙江省 杭州市 滨江区';
         }
 
         function submitOrder() {
