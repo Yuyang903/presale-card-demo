@@ -113,7 +113,71 @@
             document.getElementById('edit-add-quantity').value = 0; // 重置增加数量
             document.getElementById('edit-remark').value = row.dataset.remark || ''; 
             
+            // 重置卡号设置区域
+            document.getElementById('edit-card-no-group').style.display = 'none';
+            document.querySelector('input[name="editCardNoMode"][value="auto"]').checked = true;
+            toggleEditCardMode('auto');
+
             openModal('editBatchModal');
+        }
+        
+        // 监听增加数量变化
+        function handleEditQtyChange() {
+            var qty = parseInt(document.getElementById('edit-add-quantity').value) || 0;
+            var group = document.getElementById('edit-card-no-group');
+            if (qty > 0) {
+                group.style.display = 'block';
+                // 触发一次计算
+                var mode = document.querySelector('input[name="editCardNoMode"]:checked').value;
+                toggleEditCardMode(mode);
+            } else {
+                group.style.display = 'none';
+            }
+        }
+
+        // 切换修改卡号模式
+        function toggleEditCardMode(mode) {
+            var box = document.getElementById('editCardNoRangeBox');
+            var tip = document.getElementById('editCardNoAutoTip');
+            
+            if (mode === 'custom') {
+                box.style.display = 'flex';
+                tip.style.display = 'none';
+                calcEditCardRange();
+            } else {
+                box.style.display = 'none';
+                tip.style.display = 'block';
+                
+                // 计算自动顺延的范围
+                var btnId = document.getElementById('edit-target-btn-id').value;
+                var btn = document.getElementById(btnId);
+                if(btn) {
+                    var row = btn.closest('tr');
+                    // 假设原有范围是 1-100
+                    var startNo = parseInt(row.dataset.startNo) || 1;
+                    var currentTotal = parseInt(row.dataset.total) || parseInt(row.cells[5].innerText) || 0;
+                    
+                    // 新段起始 = 旧起始 + 旧总数
+                    // 比如 1-100 (100个)，下个是 101
+                    var nextStart = startNo + currentTotal;
+                    var qty = parseInt(document.getElementById('edit-add-quantity').value) || 0;
+                    var nextEnd = nextStart + qty - 1;
+                    
+                    if (qty > 0) {
+                        document.getElementById('editAutoRange').innerText = 'NO.' + nextStart + ' - ' + nextEnd;
+                    } else {
+                        document.getElementById('editAutoRange').innerText = '--';
+                    }
+                }
+            }
+        }
+
+        // 计算自定义范围
+        function calcEditCardRange() {
+            var start = parseInt(document.getElementById('editStartCardNo').value) || 1;
+            var qty = parseInt(document.getElementById('edit-add-quantity').value) || 0;
+            var end = start + qty - 1;
+            document.getElementById('editEndCardNo').innerText = end;
         }
         
         // 提交修改
@@ -148,11 +212,38 @@
             // 1. 更新批次名称 & 数量范围
             // 获取原有起始号
             var startNo = parseInt(row.dataset.startNo) || 1;
-            var currentTotal = parseInt(cells[5].innerText) || 0; // Total is at index 5
+            var currentTotal = parseInt(row.dataset.total) || parseInt(cells[5].innerText) || 0; // Total is at index 5
             var newTotal = currentTotal + addQty;
-            var endNo = startNo + newTotal - 1;
             
-            cells[1].innerHTML = newName + ' <br><span style="font-size:12px;color:#999;">(NO.' + startNo + '-' + endNo + ')</span>';
+            // 处理卡号显示逻辑
+            var rangeText = '';
+            var existingRangeText = '(NO.' + startNo + '-' + (startNo + currentTotal - 1) + ')';
+            
+            if (addQty > 0) {
+                var mode = document.querySelector('input[name="editCardNoMode"]:checked').value;
+                var newStartNo, newEndNo;
+                
+                if (mode === 'auto') {
+                    // 顺延
+                    newStartNo = startNo + currentTotal;
+                    newEndNo = newStartNo + addQty - 1;
+                    // 如果是顺延，显示合并后的范围
+                    // NO.1-150
+                    rangeText = '(NO.' + startNo + '-' + newEndNo + ')';
+                } else {
+                    // 自定义
+                    newStartNo = parseInt(document.getElementById('editStartCardNo').value) || 1;
+                    newEndNo = newStartNo + addQty - 1;
+                    // 显示分段范围
+                    // NO.1-100, NO.200-249
+                    // 简化显示：追加新段
+                    rangeText = existingRangeText.replace(')', '') + ', ' + newStartNo + '-' + newEndNo + ')';
+                }
+            } else {
+                rangeText = existingRangeText;
+            }
+
+            cells[1].innerHTML = newName + ' <br><span style="font-size:12px;color:#999;">' + rangeText + '</span>';
             
             // 2. 更新分发商
             var distSelect = document.getElementById('edit-distributor');
