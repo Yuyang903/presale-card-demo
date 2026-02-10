@@ -310,6 +310,95 @@
             cursor: not-allowed;
         }
 
+        /* --- 页面1.5：积分商城页 --- */
+        .mall-banner {
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .mall-points-val {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .mall-filter-bar {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 0 15px 10px;
+            margin-bottom: 5px;
+        }
+
+        .mall-filter-tag {
+            background: #fff;
+            color: #666;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+        .mall-filter-tag.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .mall-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        .mall-item {
+            width: calc(50% - 5px);
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mall-img {
+            height: 120px;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .mall-info {
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .mall-goods-title {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            height: 36px;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .mall-goods-price {
+            color: var(--warning-color);
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
         /* --- 页面2：确认订单 --- */
         .order-goods-info {
             display: flex;
@@ -466,10 +555,88 @@
             </div>
         </div>
 
+        <!-- 1.5 积分商城页 -->
+        <div id="page-mall" class="page">
+            <!-- 顶部状态提示 (默认隐藏) -->
+            <div id="mall-status-bar" class="status-alert"></div>
+
+            <div class="page-scroll-content">
+                <!-- 积分信息卡 -->
+                <div class="mall-banner">
+                    <div style="font-size: 12px; opacity: 0.8;">当前可用积分</div>
+                    <div class="mall-points-val">300 <span style="font-size: 14px; font-weight: normal;">分</span></div>
+                    <div style="font-size: 12px; opacity: 0.8;">有效期至：2026-12-31</div>
+                </div>
+                
+                <!-- 筛选栏 -->
+                <div class="mall-filter-bar">
+                    <span class="mall-filter-tag active">全部商品</span>
+                    <span class="mall-filter-tag">数码家电</span>
+                    <span class="mall-filter-tag">家居生活</span>
+                    <span class="mall-filter-tag">食品饮料</span>
+                </div>
+
+                <!-- 商品列表 -->
+                <div class="mall-grid">
+                    <!-- 商品1 -->
+                    <div class="mall-item">
+                        <div class="mall-img">唱片封面</div>
+                        <div class="mall-info">
+                            <div class="mall-goods-title">经典黑胶唱片 - 珍藏版</div>
+                            <div class="mall-goods-price">300 积分</div>
+                            <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;" onclick="handleMallRedeem(this)">立即兑换</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品2 -->
+                    <div class="mall-item">
+                        <div class="mall-img">耳机图</div>
+                        <div class="mall-info">
+                            <div class="mall-goods-title">无线蓝牙耳机</div>
+                            <div class="mall-goods-price">280 积分</div>
+                            <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;" onclick="handleMallRedeem(this)">立即兑换</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品3 -->
+                    <div class="mall-item">
+                        <div class="mall-img">保温杯图</div>
+                        <div class="mall-info">
+                            <div class="mall-goods-title">智能保温杯</div>
+                            <div class="mall-goods-price">150 积分</div>
+                            <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;" onclick="handleMallRedeem(this)">立即兑换</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 商品4 -->
+                    <div class="mall-item">
+                        <div class="mall-img">坚果图</div>
+                        <div class="mall-info">
+                            <div class="mall-goods-title">每日坚果礼盒</div>
+                            <div class="mall-goods-price">100 积分</div>
+                            <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;" onclick="handleMallRedeem(this)">立即兑换</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部导航 -->
+            <div class="bottom-action-bar">
+                <div class="nav-icon-btn" style="color: var(--primary-color);">
+                    <span class="nav-icon">🏠</span>
+                    <span>商城</span>
+                </div>
+                <div class="nav-icon-btn">
+                    <span class="nav-icon">👤</span>
+                    <span>我的</span>
+                </div>
+            </div>
+        </div>
+
         <!-- 2. 确认订单页 -->
         <div id="page-order" class="page">
             <div class="nav-bar">
-                <div class="nav-back" onclick="goBack('page-product')">‹</div>
+                <div class="nav-back" onclick="goBack('home')">‹</div>
                 确认订单
             </div>
             
@@ -524,7 +691,7 @@
                 
                 <div style="display:flex; justify-content:center; gap:15px; margin-bottom:40px;">
                     <button class="m-btn" style="background:#fff; border:1px solid #ddd; color:#666; width:auto; padding: 10px 30px;" onclick="alert('跳转订单详情')">查看订单</button>
-                    <button class="m-btn" style="width:auto; padding: 10px 30px;" onclick="goBack('page-product')">返回首页</button>
+                    <button class="m-btn" style="width:auto; padding: 10px 30px;" onclick="goBack('home')">返回首页</button>
                 </div>
 
                 <!-- 猜你喜欢 -->
@@ -557,7 +724,11 @@
 
     <!-- 演示控制面板 -->
     <div id="debug-panel">
-        <h4>演示场景切换</h4>
+        <h4>卡片类型切换</h4>
+        <label><input type="radio" name="cardType" value="product" checked onchange="switchCardType(this.value)"> 商品兑换卡</label>
+        <label><input type="radio" name="cardType" value="points" onchange="switchCardType(this.value)"> 积分礼品卡</label>
+        
+        <h4 style="margin-top:10px; border-top:1px solid #666; padding-top:5px;">场景状态</h4>
         <label><input type="radio" name="scene" value="normal" checked onchange="switchScene(this.value)"> 正常兑换</label>
         <label><input type="radio" name="scene" value="early" onchange="switchScene(this.value)"> 未到时间</label>
         <label><input type="radio" name="scene" value="used" onchange="switchScene(this.value)"> 卡片已使用</label>
@@ -572,62 +743,163 @@
         }
 
         function goBack(pageId) {
-            navigateTo(pageId);
+            // 如果是返回上一级，根据当前卡类型判断返回哪里
+            if (pageId === 'home') {
+                if (currentCardType === 'product') {
+                    navigateTo('page-product');
+                } else {
+                    navigateTo('page-mall');
+                }
+            } else {
+                navigateTo(pageId);
+            }
         }
 
-        // 场景状态
+        // 全局状态
+        let currentCardType = 'product'; // product | points
         let currentScene = 'normal';
 
+        // 切换卡片类型
+        function switchCardType(type) {
+            currentCardType = type;
+            
+            // 切换入口页
+            if (type === 'product') {
+                navigateTo('page-product');
+            } else {
+                navigateTo('page-mall');
+            }
+            
+            // 重置场景为正常
+            document.querySelector('input[name="scene"][value="normal"]').checked = true;
+            switchScene('normal');
+        }
+
+        // 切换场景状态
         function switchScene(scene) {
             currentScene = scene;
-            const btn = document.getElementById('btn-action');
             const statusBar = document.getElementById('status-bar');
+            const mallStatusBar = document.getElementById('mall-status-bar'); // 商城页的状态栏
             
-            // 重置状态
+            // 商品详情页按钮
+            const btnProduct = document.getElementById('btn-action');
+            updateBtnState(btnProduct, scene);
+            
+            // 商城页按钮 (如果有全局按钮)
+            // 这里主要控制商城列表的可点击状态
+            const mallItems = document.querySelectorAll('.mall-item .m-btn');
+            mallItems.forEach(btn => {
+                if (scene !== 'normal') {
+                    btn.classList.add('disabled');
+                    btn.innerText = scene === 'early' ? '未开始' : '已失效';
+                    btn.onclick = null;
+                } else {
+                    btn.classList.remove('disabled');
+                    btn.innerText = '立即兑换';
+                    // 重新绑定事件需要具体参数，这里简化处理，假设页面重载或在渲染时处理
+                    // 实际演示中，切换场景直接刷新页面逻辑比较简单，但这里我们用DOM操作
+                    btn.onclick = function() { handleMallRedeem(this); };
+                }
+            });
+
+            // 顶部提示栏控制
+            if (scene === 'early') {
+                statusBar.style.display = 'none'; // 按钮已显示时间，顶部隐藏以免重复，或可显示
+                // 如果是积分卡模式，商城页可能需要顶部提示
+                if (mallStatusBar) {
+                    mallStatusBar.style.display = 'flex';
+                    mallStatusBar.innerText = '⏰ 兑换开始时间：2026-05-01 10:00';
+                }
+            } else if (scene === 'used') {
+                 if (mallStatusBar) {
+                    mallStatusBar.style.display = 'flex';
+                    mallStatusBar.innerText = '🚫 卡片已使用，仅供浏览';
+                }
+            } else {
+                statusBar.style.display = 'none';
+                if (mallStatusBar) mallStatusBar.style.display = 'none';
+            }
+            
+            // 如果在详情页或商城页，刷新当前视图状态
+            // (已在上方代码通过直接操作DOM更新了)
+        }
+
+        function updateBtnState(btn, scene) {
+            if (!btn) return;
+            
+            // 重置样式
             btn.className = 'main-action-btn';
-            btn.style.flexDirection = 'row'; // 重置布局方向
-            btn.style.lineHeight = 'normal'; // 重置行高
-            statusBar.style.display = 'none'; // 默认隐藏提示栏
+            btn.style.flexDirection = 'row';
+            btn.style.lineHeight = 'normal';
             
             if (scene === 'normal') {
                 btn.classList.add('active');
                 btn.innerText = '立即兑换';
             } else if (scene === 'early') {
                 btn.classList.add('disabled');
-                // 按钮显示两行：时间和说明
                 btn.style.flexDirection = 'column';
                 btn.style.lineHeight = '1.3';
                 btn.innerHTML = '<span style="font-size:15px">2026-05-01 10:00</span><span style="font-size:11px; opacity:0.8;">开始兑换</span>';
-                
-                // 既然按钮上已经显示了时间，顶部提示栏可以选择隐藏，或者保留作为强调。
-                // 根据用户指令“按钮展示内容调整为...”，重点在按钮。这里选择隐藏顶部栏以避免冗余。
-                statusBar.style.display = 'none'; 
             } else if (scene === 'used') {
                 btn.classList.add('disabled');
                 btn.innerText = '卡片已使用';
             }
-            
-            // 如果不在首页，强制回到首页
-            navigateTo('page-product');
         }
 
-        // 业务逻辑
+        // 业务逻辑：商品卡兑换
         function handleRedeem() {
-            if (currentScene !== 'normal') {
-                return; // 禁用状态下不可点击
-            }
-            // 跳转到订单页
+            if (currentScene !== 'normal') return;
+            
+            // 设置订单页信息为商品卡模式
+            updateOrderPage({
+                img: '', // 使用默认占位
+                title: '【尊享版】享乐派豪华礼包',
+                desc: '规格：默认 (特级茶叶+坚果礼盒...)',
+                price: 'x 1'
+            });
+            
             navigateTo('page-order');
         }
 
+        // 业务逻辑：积分商城兑换
+        function handleMallRedeem(btnElement) {
+            if (currentScene !== 'normal') return;
+            
+            // 获取商品信息
+            const item = btnElement.closest('.mall-item');
+            const title = item.querySelector('.mall-goods-title').innerText;
+            const points = item.querySelector('.mall-goods-price').innerText;
+            
+            // 设置订单页信息为积分卡模式
+            updateOrderPage({
+                img: '', 
+                title: title,
+                desc: '规格：默认',
+                price: `消耗: <span style="color:var(--warning-color); font-weight:bold;">${points}</span>`
+            });
+            
+            navigateTo('page-order');
+        }
+
+        function updateOrderPage(info) {
+            const container = document.querySelector('.order-goods-info');
+            container.innerHTML = `
+                <div class="order-goods-img"></div>
+                <div>
+                    <div style="font-weight:bold; font-size:14px; margin-bottom:5px; line-height:1.4;">${info.title}</div>
+                    <div style="color:#999; font-size:12px; margin-bottom: 5px;">${info.desc}</div>
+                    <div style="font-size:13px;">${info.price}</div>
+                </div>
+            `;
+        }
+
         function submitOrder() {
-            // 简单验证
-            // 跳转成功页
             navigateTo('page-success');
         }
 
         // 初始化
-        switchScene('normal');
+        // 默认显示商品卡
+        switchCardType('product');
 
     </script>
 </body>
