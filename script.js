@@ -73,29 +73,45 @@
             var row = btn.closest('tr');
             var cells = row.cells;
             
-            // 获取当前值
-            // cells[1] 是批次名称列，可能包含 span 标签 (自动生成/卡号范围)
-            // 使用 innerText 会获取所有文本，我们需要第一行
+            // 1. 批次名称
             var batchNameText = cells[1].innerText;
             var batchName = batchNameText.split('\n')[0].trim();
             
-            var timeCell = cells[5];
-            // 尝试提取预计发货时间
+            // 2. 分发商 (简单匹配)
+            var distText = cells[3].innerText.trim();
+            var distVal = "";
+            if (distText.includes("分发商A")) distVal = "dist_a";
+            else if (distText.includes("分发商B")) distVal = "dist_b";
+            // else 直营 or unknown -> ""
+
+            // 3. 时间信息 (生成/开始/发货)
+            var timeCell = cells[6];
             // 结构: <div>生成...</div><div>开始...</div><div>预计发货...</div>
-            var deliveryDiv = timeCell.querySelector('div:nth-child(3)');
-            var deliveryTime = '';
+            // 解析所有div文本
+            var divs = timeCell.querySelectorAll('div');
+            var startTime = "";
+            var deliveryTime = "";
             
-            if (deliveryDiv) {
-                var text = deliveryDiv.innerText; // "预计发货：2023-10-05"
-                if (text.indexOf('：') > -1) {
-                    deliveryTime = text.split('：')[1].trim();
+            divs.forEach(div => {
+                var text = div.innerText;
+                if (text.includes("开始：")) {
+                    // 格式: 开始：2023-09-20 00:00
+                    var t = text.split('：')[1].trim();
+                    // input type="datetime-local" 需要格式 YYYY-MM-DDTHH:mm
+                    startTime = t.replace(' ', 'T');
                 }
-            }
-            
+                if (text.includes("发货：")) {
+                     deliveryTime = text.split('：')[1].trim();
+                }
+            });
+
             // 填充表单
             document.getElementById('edit-batch-name').value = batchName;
+            document.getElementById('edit-distributor').value = distVal;
+            document.getElementById('edit-start-time').value = startTime;
             document.getElementById('edit-delivery-time').value = deliveryTime;
-            document.getElementById('edit-remark').value = row.dataset.remark || ''; // 回填备注
+            document.getElementById('edit-add-quantity').value = 0; // 重置增加数量
+            document.getElementById('edit-remark').value = row.dataset.remark || ''; 
             
             openModal('editBatchModal');
         }
@@ -106,8 +122,6 @@
             var btn = document.getElementById(btnId);
             
             if (!btn) {
-                // 如果找不到按钮（异常情况），尝试重新获取
-                // 这里简单处理：关闭弹窗
                 closeModal('editBatchModal');
                 return;
             }
@@ -116,45 +130,70 @@
             var cells = row.cells;
             
             var newName = document.getElementById('edit-batch-name').value.trim();
+            var newDistVal = document.getElementById('edit-distributor').value;
+            var newStartTime = document.getElementById('edit-start-time').value;
             var newDelivery = document.getElementById('edit-delivery-time').value;
+            var addQty = parseInt(document.getElementById('edit-add-quantity').value) || 0;
             var newRemark = document.getElementById('edit-remark').value;
             
             if(!newName) {
                 alert('批次名称不能为空');
                 return;
             }
-            
-            // 更新表格 - 批次名称
-            // 保留原有的小字部分 (如: (自动生成))
-            var originalHtml = cells[1].innerHTML;
-            if(originalHtml.includes('<br>')) {
-                // 如果有换行（说明有副标题），保留副标题
-                var parts = originalHtml.split('<br>');
-                // parts[0] 是旧名称，parts[1] 是副标题 span
-                cells[1].innerHTML = newName + ' <br>' + parts.slice(1).join('<br>');
-            } else {
-                cells[1].innerText = newName;
+            if(addQty < 0) {
+                alert('增加数量不能为负数');
+                return;
             }
             
-            // 更新表格 - 预计发货时间
-            var timeCell = cells[5];
-            var deliveryDiv = timeCell.querySelector('div:nth-child(3)');
-            if (deliveryDiv) {
-                deliveryDiv.innerHTML = '预计发货：' + (newDelivery || '待定');
-            } else {
-                // 如果没找到div（极端情况），追加一个
-                var newDiv = document.createElement('div');
-                newDiv.style.color = '#27ae60';
-                newDiv.innerHTML = '预计发货：' + (newDelivery || '待定');
-                timeCell.appendChild(newDiv);
+            // 1. 更新批次名称 & 数量范围
+            // 获取原有起始号
+            var startNo = parseInt(row.dataset.startNo) || 1;
+            var currentTotal = parseInt(cells[5].innerText) || 0; // Total is at index 5
+            var newTotal = currentTotal + addQty;
+            var endNo = startNo + newTotal - 1;
+            
+            cells[1].innerHTML = newName + ' <br><span style="font-size:12px;color:#999;">(NO.' + startNo + '-' + endNo + ')</span>';
+            
+            // 2. 更新分发商
+            var distSelect = document.getElementById('edit-distributor');
+            var distText = distSelect.options[distSelect.selectedIndex].text;
+            if (newDistVal === "") distText = "直营"; // 简化显示
+            cells[3].innerText = distText;
+
+            // 3. 更新数量
+            cells[5].innerText = newTotal;
+            row.dataset.total = newTotal;
+            
+            // 4. 更新时间信息
+            // 保持原有的生成时间
+            var timeCell = cells[6];
+            var genTimeDiv = timeCell.querySelector('div:first-child'); // 假设第一个是生成时间
+            var genTimeHtml = genTimeDiv ? genTimeDiv.outerHTML : '<div style="color:#999;">生成：-</div>';
+            
+            var startTimeHtml = '';
+            if (newStartTime) {
+                var displayStart = newStartTime.replace('T', ' ');
+                startTimeHtml = '<div>开始：' + displayStart + '</div>';
             }
             
-            // 如果有备注逻辑，可以在这里处理 (目前没有显示备注的地方，暂存或忽略)
+            var deliveryHtml = '';
+             if (newDelivery) {
+                deliveryHtml = '<div style="color:#27ae60;">预计发货：' + newDelivery + '</div>';
+            }
+            
+            timeCell.innerHTML = genTimeHtml + startTimeHtml + deliveryHtml;
+
+            // 5. 更新备注
+            row.dataset.remark = newRemark;
             
             closeModal('editBatchModal');
-            // 使用 setTimeout 避免 alert 阻塞弹窗关闭动画
             setTimeout(function() {
-                alert('修改已保存');
+                var msg = '修改已保存';
+                if (addQty > 0) {
+                    msg += '\n已增加 ' + addQty + ' 张卡片';
+                    // 实际逻辑中这里会调用后端接口生成新卡片
+                }
+                alert(msg);
             }, 100);
         }
 
@@ -393,21 +432,16 @@
                 var row = btn.closest('tr');
                 var cells = row.cells;
                 
-                // 1. Update Status (Column 7, index 6)
-                cells[6].innerHTML = '<span class="tag p1">已激活</span>';
+                // 1. Update Status (Column 7, index 7)
+                // Wait, index 7 is Status?
+                // 0:Chk, 1:Name, 2:Type, 3:Dist, 4:Content, 5:Qty, 6:Time, 7:Status, 8:Action
+                cells[7].innerHTML = '<span class="tag p1">已激活</span>';
                 
-                // 2. Update Stats (Column 5, index 4) -> Total / 0 / 0
-                var total = parseInt(cells[3].innerText); // Column 4 is Total
-                cells[4].innerText = total + ' / 0 / 0';
-                
-                // 3. Hide Activate Button
+                // 2. Hide Activate Button
                 btn.style.display = 'none';
                 
-                // 4. Close Modal
+                // 3. Close Modal
                 closeModal('activateConfirmModal');
-                
-                // 5. Show Success Message (Optional, use a toast in real app)
-                // alert('批次已激活成功！'); 
             }
         }
 
@@ -416,37 +450,16 @@
             var row = btn.closest('tr');
             var cells = row.cells;
             
-            // 获取统计数据：激活 / 已使用 / 作废
-            // Index 4: "330 / 120 / 5"
-            var statsText = cells[4].innerText; 
-            var stats = statsText.split('/').map(s => parseInt(s.trim()));
-            var usedCount = stats[1] || 0;
-            
-            if (usedCount > 0) {
-                alert('该批次已有 ' + usedCount + ' 张卡片被使用，无法作废！');
-                return;
-            }
-            
             if (confirm('确定要作废该批次吗？\n注意：未使用的卡片将全部失效！')) {
                 // 执行作废逻辑
-                // 1. 更新状态
-                cells[6].innerHTML = '<span class="tag p0">已作废</span>';
+                // 1. Update Status (Index 7)
+                cells[7].innerHTML = '<span class="tag p0">已作废</span>';
                 
-                // 2. 更新统计数据 (假设剩余未使用的都变作废)
-                var total = parseInt(cells[3].innerText);
-                // 简单处理：已使用保持不变，剩下的归为作废
-                // 新作废 = 总数 - 已使用
-                var newVoided = total - usedCount;
-                cells[4].innerText = '0 / ' + usedCount + ' / ' + newVoided;
-                
-                // 3. 隐藏操作按钮 (或者禁用)
-                // btn.disabled = true;
-                // 或者移除除了详情外的按钮
+                // 2. 移除操作按钮
                 var td = btn.parentNode;
-                // 保留 批次/卡片 按钮，移除 修改/激活/作废
-                // 简单重建innerHTML
+                // 保留 批次/卡片 按钮
                 td.innerHTML = `
-                    <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">批次</button>
+                    <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
                     <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
                 `;
                 
@@ -546,124 +559,85 @@
 
         // 提交制卡任务
         function submitCreateCard() {
-            // 1. 获取输入值
             var batchName = document.querySelector('#createCardModal input[type="text"]').value;
-            if(!batchName) {
-                alert('请输入批次名称');
-                return;
-            }
+            if(!batchName) { alert('请输入批次名称'); return; }
             
-            // 获取卡片类型
             var cardType = document.querySelector('input[name="cardType"]:checked').value;
             var productText = '';
             var typeHtml = '';
-
+            
             if (cardType === 'product') {
-                // 商品卡：不再强制绑定商品，改为后置关联
                 productText = '<span style="font-size:12px;color:#e74c3c;">(待关联商品)</span>';
                 typeHtml = '<span class="tag p2">商品卡</span>';
             } else {
-                // 获取积分面额
                 var points = document.getElementById('card-points').value;
-                if (!points || points <= 0) {
-                    alert('请输入有效的积分面额');
-                    return;
-                }
-                productText = points + ' 积分 <br><span style="font-size:12px;color:#e74c3c;">(待关联商品)</span>';
+                if(!points) { alert('请输入积分面额'); return; }
+                productText = points + ' 积分';
                 typeHtml = '<span class="tag" style="background:#9b59b6;">积分卡</span>';
             }
-            
-            // 获取分发商
+
             var distributorSelect = document.querySelector('#createCardModal select:last-of-type'); 
-            // 修正定位逻辑：找到包含"关联分发商"的form-group
             var distributorText = '直营';
-            var discountRate = '-';
-            
+            // Find distributor
             var formGroups = document.querySelectorAll('#createCardModal .form-group');
             formGroups.forEach(group => {
                 if (group.innerText.includes('关联分发商')) {
                     var sel = group.querySelector('select');
-                    var inp = group.querySelector('input[type="number"]'); // 获取折扣率输入框
-                    if (sel && sel.value) {
-                        distributorText = sel.options[sel.selectedIndex].text.split(' ')[0];
-                        if (inp && inp.value && cardType !== 'product') {
-                            discountRate = inp.value + '%';
-                            distributorText += ' (' + discountRate + ')';
-                        }
-                    }
+                    if (sel && sel.value) distributorText = sel.options[sel.selectedIndex].text.split(' ')[0];
                 }
             });
 
             var quantity = parseInt(document.getElementById('card-quantity').value) || 0;
-            if (quantity <= 0) {
-                alert('制卡数量必须大于0');
-                return;
-            }
+            if (quantity <= 0) { alert('制卡数量必须大于0'); return; }
 
-            var isActivated = document.getElementById('s2').checked; // s2是直接激活
-            
-            // 强制不能直接激活：无论是商品卡还是积分卡，都需要先关联商品
-            if (isActivated) {
-                alert('批次创建后必须先关联商品，暂不能直接激活！\n系统已自动为您调整为“未激活”状态。');
-                isActivated = false;
-            }
-
-            var statusHtml = isActivated ? '<span class="tag p1">已激活</span>' : '<span class="tag gray">未激活</span>';
+            // Always Inactive
+            var isActivated = false;
+            var statusHtml = '<span class="tag gray">未激活</span>';
             var now = formatDate(new Date());
             
-            // 获取时间设置
-            var startTime = document.getElementById('create-start-time').value.replace('T', ' ') || '-';
             var deliveryTime = document.getElementById('create-delivery-time').value || '-';
-            var remark = document.getElementById('create-remark').value; // 获取备注
+            var remark = document.getElementById('create-remark').value;
 
-            // 获取卡号范围信息
             var cardMode = document.querySelector('input[name="cardNoMode"]:checked').value;
             var startNo = 1; 
-            var endNo = quantity;
             if (cardMode === 'custom') {
                  startNo = parseInt(document.getElementById('startCardNo').value) || 1;
-                 endNo = startNo + quantity - 1;
             }
+            var endNo = startNo + quantity - 1;
             
-            // 2. 构造新行HTML
-            // 我们将一些元数据存储在 data 属性中，方便 showBatchDetail 读取
-            // 注意：onclick="showBatchDetail(this)" 需要传递 this
             var newRow = document.createElement('tr');
             newRow.dataset.total = quantity;
-            newRow.dataset.remark = remark; // 存储备注
+            newRow.dataset.remark = remark;
+            newRow.dataset.startNo = startNo; // Store start no
+            newRow.dataset.linked = "false";
+            newRow.id = 'tr-' + Date.now(); // Ensure ID
+            
+            // Columns: 0:Chk, 1:Name, 2:Type, 3:Dist, 4:Content, 5:Qty, 6:Time, 7:Status, 8:Action
             newRow.innerHTML = `
                 <td><input type="checkbox"></td>
-                <td>${batchName} <br><span style="font-size:12px;color:#999;">${cardMode === 'custom' ? '(NO.' + startNo + '-' + endNo + ')' : '(自动生成)'}</span></td>
+                <td>${batchName} <br><span style="font-size:12px;color:#999;">(NO.${startNo}-${endNo})</span></td>
                 <td>${typeHtml}</td>
                 <td>${distributorText}</td>
                 <td>${productText}</td>
                 <td>${quantity}</td>
-                <td>${isActivated ? quantity + ' / 0 / 0' : '0 / 0 / 0'}</td>
                 <td style="font-size:12px; line-height:1.4;">
                     <div style="color:#999;">生成：${now.split(' ')[0]}</div>
                     <div style="color:#27ae60;">发货：${deliveryTime}</div>
                 </td>
                 <td>${statusHtml}</td>
                 <td>
-                    ${!isActivated ? '<button class="btn btn-success btn-sm" onclick="activateBatch(this)">激活</button>' : ''}
                     <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
                     <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
                     <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
                     <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
-                    ${!isActivated ? '<button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>' : ''}
                 </td>
             `;
             
-            // 3. 插入表格第一行
             var tbody = document.querySelector('#card-list-view tbody');
             tbody.insertBefore(newRow, tbody.firstChild);
             
-            // 4. 关闭弹窗并提示
             closeModal('createCardModal');
-            alert('制卡任务已提交！\n批次：' + batchName + '\n类型：' + (cardType==='product'?'商品卡':'积分卡') + '\n数量：' + quantity);
-            
-            // 清空表单(可选)
-            // ... (简化清空逻辑)
+            alert('制卡任务已提交！\n批次：' + batchName + '\n数量：' + quantity + '\n状态：未激活');
         }
 
         // --- 关联商品相关逻辑 ---
