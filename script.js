@@ -328,41 +328,56 @@
             var row = btn.closest('tr');
             if (!row) return;
 
+            // Determine context
+            var container = row.closest('.admin-module');
+            var type = 'product';
+            if (container && container.id === 'tab-card-points') type = 'points';
+            var suffix = '-' + type;
+
             var cells = row.cells;
             var batchName = cells[1].innerText.split('\n')[0];
             
             // 更新详情页标题
-            document.getElementById('detail-batch-name').innerText = '批次卡片列表：' + batchName;
+            var titleEl = document.getElementById('detail-batch-name' + suffix);
+            if(titleEl) titleEl.innerText = '批次卡片列表：' + batchName;
             
-            // 更新统计数据 (如果有对应id的话)
-            // 注意：目前的HTML结构中保留了统计卡片，我们可以尝试更新它，也可以保持默认
-            // 最好是从行数据中获取并更新，保持数据一致性
-            var totalCount = row.dataset.total || cells[3].innerText;
-            var stats = cells[4].innerText.split('/').map(s => parseInt(s.trim()));
-            var activated = stats[0] || 0;
-            var used = stats[1] || 0;
-            var voided = stats[2] || 0;
+            // 更新统计数据
+            var totalCount = row.dataset.total || cells[5].innerText;
             
-            if(document.getElementById('detail-total-count')) document.getElementById('detail-total-count').innerText = totalCount;
-            if(document.getElementById('detail-activated-count')) document.getElementById('detail-activated-count').innerText = activated;
-            if(document.getElementById('detail-used-count')) document.getElementById('detail-used-count').innerText = used;
-            if(document.getElementById('detail-void-count')) document.getElementById('detail-void-count').innerText = voided;
+            var activated = 0;
+            var used = 0;
+            var voided = 0;
+            var status = cells[7].innerText.trim();
+            if(status.includes('已激活')) activated = totalCount;
+            if(status.includes('已作废')) voided = totalCount;
+            
+            if(document.getElementById('detail-total-count' + suffix)) document.getElementById('detail-total-count' + suffix).innerText = totalCount;
+            if(document.getElementById('detail-activated-count' + suffix)) document.getElementById('detail-activated-count' + suffix).innerText = activated;
+            if(document.getElementById('detail-used-count' + suffix)) document.getElementById('detail-used-count' + suffix).innerText = used;
+            if(document.getElementById('detail-void-count' + suffix)) document.getElementById('detail-void-count' + suffix).innerText = voided;
 
             // 切换主视图
-            document.getElementById('card-list-view').style.display = 'none';
-            document.getElementById('card-detail-view').style.display = 'block';
+            var listView = document.getElementById('card-list-view' + suffix);
+            var detailView = document.getElementById('card-detail-view' + suffix);
+            
+            if(listView) listView.style.display = 'none';
+            if(detailView) detailView.style.display = 'block';
         }
-
-        // 显示批次详情 (旧函数，保留以防万一，但已废弃入口)
-        function showBatchDetail(btn) {
-             // ...
-        }
-
 
         // 隐藏批次详情（返回列表）
-        function hideBatchDetail() {
-            document.getElementById('card-detail-view').style.display = 'none';
-            document.getElementById('card-list-view').style.display = 'block';
+        function hideBatchDetail(type) {
+             if (!type) {
+                // Try to infer visible one
+                if (document.getElementById('card-detail-view-product') && document.getElementById('card-detail-view-product').style.display !== 'none') type = 'product';
+                else if (document.getElementById('card-detail-view-points') && document.getElementById('card-detail-view-points').style.display !== 'none') type = 'points';
+                else type = 'product'; // default
+            }
+            var suffix = '-' + type;
+            var detailView = document.getElementById('card-detail-view' + suffix);
+            var listView = document.getElementById('card-list-view' + suffix);
+            
+            if(detailView) detailView.style.display = 'none';
+            if(listView) listView.style.display = 'block';
         }
 
         // 更新添加按钮状态
@@ -648,6 +663,18 @@
             }
         }
 
+        // 打开新增制卡弹窗 (带类型)
+        function openCreateCardModal(type) {
+            openModal('createCardModal');
+            var radios = document.getElementsByName('cardType');
+            for(var i=0; i<radios.length; i++) {
+                if(radios[i].value === type) {
+                    radios[i].checked = true;
+                    toggleCardType(type);
+                }
+            }
+        }
+
         // 提交制卡任务
         function submitCreateCard() {
             var batchName = document.querySelector('#createCardModal input[type="text"]').value;
@@ -701,6 +728,7 @@
             newRow.dataset.remark = remark;
             newRow.dataset.startNo = startNo; // Store start no
             newRow.dataset.linked = "false";
+            newRow.dataset.type = cardType;
             newRow.id = 'tr-' + Date.now(); // Ensure ID
             
             // Columns: 0:Chk, 1:Name, 2:Type, 3:Dist, 4:Content, 5:Qty, 6:Time, 7:Status, 8:Action
@@ -724,11 +752,19 @@
                 </td>
             `;
             
-            var tbody = document.querySelector('#card-list-view tbody');
-            tbody.insertBefore(newRow, tbody.firstChild);
-            
-            closeModal('createCardModal');
-            alert('制卡任务已提交！\n批次：' + batchName + '\n数量：' + quantity + '\n状态：未激活');
+            // Determine target table
+            var targetTableId = 'card-list-view-product';
+            if (cardType === 'points') {
+                targetTableId = 'card-list-view-points';
+            }
+            var tbody = document.querySelector('#' + targetTableId + ' tbody');
+            if (tbody) {
+                tbody.insertBefore(newRow, tbody.firstChild);
+                closeModal('createCardModal');
+                alert('制卡任务已提交！\n批次：' + batchName + '\n数量：' + quantity + '\n状态：未激活');
+            } else {
+                console.error('Target table body not found:', targetTableId);
+            }
         }
 
         // --- 关联商品相关逻辑 ---
