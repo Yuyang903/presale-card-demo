@@ -612,6 +612,63 @@
             gap: 10px;
         }
         
+        /* 0. 品牌宣传页样式 */
+        .landing-bg {
+            background: linear-gradient(135deg, #3498db, #8e44ad);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            height: 100%;
+        }
+
+        .landing-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        .landing-title {
+            margin: 0 0 10px 0;
+            font-size: 32px;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        .landing-subtitle {
+            opacity: 0.9;
+            margin: 0 0 50px 0;
+            font-size: 16px;
+        }
+
+        .landing-btn {
+            background: #fff;
+            color: var(--primary-color);
+            font-size: 18px;
+            padding: 15px 40px;
+            border-radius: 30px;
+            border: none;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 80%;
+            max-width: 280px;
+        }
+
+        .landing-btn:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        
         .like-item {
             width: calc(50% - 5px);
             background: #fff;
@@ -649,8 +706,25 @@
     <!-- 主App容器 -->
     <div id="app-container">
         
+        <!-- 0. 品牌宣传页 (入口页) -->
+        <div id="page-landing" class="page active">
+            <div class="landing-bg">
+                <div class="landing-icon">🎁</div>
+                <div class="landing-title">享乐派惊喜卡</div>
+                <div class="landing-subtitle">尊享品质 · 乐享生活</div>
+                
+                <button class="landing-btn" onclick="enterApp()">
+                    去兑换
+                </button>
+                
+                <div style="margin-top:40px; font-size:12px; opacity:0.6;">
+                    开启您的专属惊喜之旅
+                </div>
+            </div>
+        </div>
+
         <!-- 1. 商品详情页 -->
-        <div id="page-product" class="page active">
+        <div id="page-product" class="page">
             <!-- 顶部状态提示 (默认隐藏) -->
             <div id="status-bar" class="status-alert">
                 ⏰ 兑换开始时间：2026-05-01 10:00
@@ -666,11 +740,6 @@
                 <div class="m-card">
                     <div class="goods-title">【尊享版】享乐派豪华礼包 | 特级茶叶+坚果礼盒+定制保温杯</div>
                     <div class="goods-subtitle">企业定制首选 · 限量发售 · 包含精美礼品袋</div>
-                    <div class="goods-meta">
-                        <span>运费：包邮</span>
-                        <span>月销 1000+</span>
-                        <span>库存 500</span>
-                    </div>
                 </div>
 
                 <div class="m-card">
@@ -678,27 +747,6 @@
                         <span style="color:#999; width: 40px;">保障</span>
                         <span style="flex:1;">正品保证 · 极速发货 · 7天无理由</span>
                         <span style="color:#ccc;">></span>
-                    </div>
-                </div>
-
-                <div class="user-recommend">
-                    <div class="recommend-header">
-                        <h4 style="margin:0; font-size:15px;">用户推荐</h4>
-                        <span style="font-size:12px; color:#999;">查看全部 ></span>
-                    </div>
-                    <div class="recommend-item">
-                        <div class="avatar"></div>
-                        <div>
-                            <div style="margin-bottom:3px; font-weight:bold;">王先生</div>
-                            <div style="line-height:1.4;">包装非常精美，送礼很有面子，茶叶口感也不错！</div>
-                        </div>
-                    </div>
-                    <div class="recommend-item">
-                        <div class="avatar"></div>
-                        <div>
-                            <div style="margin-bottom:3px; font-weight:bold;">李女士</div>
-                            <div style="line-height:1.4;">兑换流程很顺畅，发货也快，五星好评。</div>
-                        </div>
                     </div>
                 </div>
 
@@ -723,6 +771,10 @@
                 <div class="nav-icon-btn">
                     <span class="nav-icon">🎧</span>
                     <span>客服</span>
+                </div>
+                <div class="nav-icon-btn" onclick="alert('跳转我的订单列表')">
+                    <span class="nav-icon">📜</span>
+                    <span>订单</span>
                 </div>
                 <!-- 动态按钮区域 -->
                 <div id="btn-action" class="main-action-btn active" onclick="handleRedeem()">
@@ -801,6 +853,10 @@
                 <div class="nav-icon-btn" style="color: var(--primary-color);">
                     <span class="nav-icon">🏠</span>
                     <span>商城</span>
+                </div>
+                <div class="nav-icon-btn" onclick="alert('跳转我的订单列表')">
+                    <span class="nav-icon">📜</span>
+                    <span>订单</span>
                 </div>
                 <div class="nav-icon-btn">
                     <span class="nav-icon">👤</span>
@@ -962,6 +1018,15 @@
     </div>
 
     <script>
+        // 进入App逻辑
+        function enterApp() {
+            if (currentCardType === 'product') {
+                navigateTo('page-product');
+            } else {
+                navigateTo('page-mall');
+            }
+        }
+
         // 页面跳转逻辑
         function navigateTo(pageId) {
             document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
@@ -1284,8 +1349,11 @@
         }
 
         // 初始化
-        // 默认显示商品卡
-        switchCardType('product');
+        // 默认显示品牌宣传页
+        // switchCardType('product'); // 移除，避免直接跳转
+        currentCardType = 'product'; // 默认为商品卡
+        switchScene('normal'); // 初始化场景
+        // navigateTo('page-landing'); // HTML中已默认active，无需再次调用
 
     </script>
 </body>
