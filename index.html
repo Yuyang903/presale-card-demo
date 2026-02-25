@@ -504,6 +504,17 @@
                                             <button class="btn btn-danger btn-sm" onclick="toggleDistributorStatus(this)">停用</button>
                                         </td>
                                     </tr>
+                                    <tr data-id="d3" data-type="dealership">
+                                        <td>天沐</td>
+                                        <td><span class="tag" style="background:#8e44ad;">经销</span></td>
+                                        <td>李总</td>
+                                        <td>13500000000</td>
+                                        <td><span class="tag p1">合作中</span></td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="editDistributor(this)">编辑</button>
+                                            <button class="btn btn-danger btn-sm" onclick="toggleDistributorStatus(this)">停用</button>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -664,7 +675,7 @@
                         <div class="admin-card" style="margin-bottom: 20px;">
                             <!-- 财务子Tab -->
                             <div style="display:flex; gap:30px; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-                                <div id="ft-income" class="finance-tab active" onclick="switchFinanceTab('income')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">收款管理</div>
+                                <div id="ft-income" class="finance-tab active" onclick="switchFinanceTab('income')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">经销管理</div>
                                 <div id="ft-channel" class="finance-tab" onclick="switchFinanceTab('channel')" style="color:#666; cursor:pointer; padding-bottom:5px;">分销管理</div>
                                 <div id="ft-cost" class="finance-tab" onclick="switchFinanceTab('cost')" style="color:#666; cursor:pointer; padding-bottom:5px;">制卡成本</div>
                                 <div id="ft-overview" class="finance-tab" onclick="switchFinanceTab('overview')" style="color:#666; cursor:pointer; padding-bottom:5px;">收支概览</div>
@@ -1315,6 +1326,7 @@
                     <label>关联分发商</label>
                     <select id="edit-distributor" class="form-control">
                         <option value="">直营 (无分发商)</option>
+                        <option value="dist_c">天沐 (经销)</option>
                         <option value="dist_a">一直娱</option>
                         <option value="dist_b">一直娱 (广州)</option>
                     </select>
@@ -1391,6 +1403,9 @@
                         </label>
                         <label style="font-weight:normal; margin-right:20px; cursor:pointer;">
                             <input type="radio" name="distributorType" value="distribution"> 分销 (代销/返佣)
+                        </label>
+                        <label style="font-weight:normal; margin-right:20px; cursor:pointer;">
+                            <input type="radio" name="distributorType" value="dealership"> 经销 (买断/批发)
                         </label>
                     </div>
                 </div>
@@ -1472,8 +1487,9 @@
                         <div style="display:flex; gap:15px; align-items:flex-start;">
                             <div style="width: 280px;">
                                 <label style="font-size:12px; color:#666; margin-bottom:5px; display:block; font-weight:normal;">选择分发商</label>
-                                <select class="form-control" style="width:100%;">
+                                <select class="form-control" style="width:100%;" id="create-card-distributor" onchange="handleDistributorChange(this)">
                                     <option value="">请选择分发商...</option>
+                                    <option value="dist_c">天沐 (经销)</option>
                                     <option value="dist_a">一直娱</option>
                                     <option value="dist_b">一直娱 (广州)</option>
                                 </select>
@@ -1485,9 +1501,19 @@
                                     <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#999; font-size:12px;">%</span>
                                 </div>
                             </div>
+                            <div style="width:140px; display:none;" id="channel-fee-rate-group">
+                                <label style="font-size:12px; color:#666; margin-bottom:5px; display:block; font-weight:normal;">渠道费率 (%)</label>
+                                <div style="position:relative;">
+                                    <input type="number" id="channel-fee-rate" class="form-control" placeholder="如 5" value="5" style="padding-right: 25px;">
+                                    <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:#999; font-size:12px;">%</span>
+                                </div>
+                            </div>
                         </div>
                         <div style="margin-top: 8px; font-size: 12px; color: #999; line-height: 1.4;" id="discount-rate-tip">
                             * 设置折扣率后，系统将按 <code>实际发货商品价值 × 折扣率</code> 自动计算应结算金额。
+                        </div>
+                        <div style="margin-top: 8px; font-size: 12px; color: #999; line-height: 1.4; display:none;" id="channel-fee-tip">
+                            * 设置渠道费率后，结算时将自动计算：<code>本次结算渠道费 = 本次结算金额 × 渠道费率</code>。
                         </div>
                     </div>
                 </div>
@@ -1831,6 +1857,7 @@
                     <div style="display: flex; gap: 10px;">
                         <select id="income-customer-select" class="form-control" onchange="toggleCustomerInput(this)">
                             <option value="">请选择...</option>
+                            <option value="d3">天沐 (经销)</option>
                             <option value="d1">一直娱 (分销)</option>
                             <option value="d2">一直娱 (广州) (分销)</option>
                             <option value="custom">其他 (手动输入)</option>
