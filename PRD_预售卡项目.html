@@ -632,7 +632,20 @@
         </tr>
     </table>
 
-    <h3 id="module-distributor">4.2 分发商管理</h3>
+    <h3 id="module-distributor">4.2 分发商管理与合作模式</h3>
+    <div style="background:#e8f6f3; padding:15px; border:1px solid #d4efdf; border-radius:4px; margin-bottom: 20px;">
+        <h4 style="margin-top:0; color:#16a085;">核心合作模式定义</h4>
+        <p><strong>1. 分销模式 (Distribution)：</strong><br>
+        分发商作为渠道方，代销卡片，不压货。结算基于实际销售/激活量。<br>
+        - <strong>财务逻辑</strong>：涉及“渠道费”计算。若我方收款，需支付渠道费；若对方收款，需扣除渠道费后结算余额。<br>
+        - <strong>关键动作</strong>：发卡(0元) -> 销售 -> 月结。</p>
+        
+        <p><strong>2. 经销模式 (Dealership)：</strong><br>
+        经销商买断卡片，预付货款。<br>
+        - <strong>财务逻辑</strong>：以“订单”为核心，先款后货（或信用账期）。我方全额开票。<br>
+        - <strong>关键动作</strong>：收款 -> 订单 -> 发货 -> 开票。</p>
+    </div>
+
     <table>
         <tr>
             <th>功能点</th>
@@ -643,7 +656,7 @@
             <td>分发商列表</td>
             <td><span class="tag p0">P0</span></td>
             <td>
-                展示：分发商名称、联系人、电话、合作状态。<br>
+                展示：分发商名称、<strong>类型（自营/分销/经销）</strong>、联系人、电话、合作状态。<br>
                 操作：新增、编辑、停用。
             </td>
         </tr>
@@ -651,7 +664,7 @@
             <td>新增/编辑</td>
             <td><span class="tag p0">P0</span></td>
             <td>
-                字段：名称、联系方式、地址。
+                字段：名称、<strong>类型选择</strong>、联系方式、地址、<strong>开票信息</strong>。
             </td>
         </tr>
     </table>
@@ -679,46 +692,45 @@
             <td>按月份或季度统计制卡总支出。</td>
         </tr>
         <tr>
-            <td rowspan="2">收款管理</td>
-            <td>售卡收款记录</td>
+            <td rowspan="2" style="background-color:#f9e79f;">经销管理<br>(原收款管理)</td>
+            <td>订单收款记录</td>
             <td><span class="tag p0">P0</span></td>
             <td>
-                记录卡片销售的入账信息。<br>
-                输入：客户名称（企业/个人）、购买数量、关联卡号段（可选）、实收金额、支付方式（转账/现金/其他）、经手人。
+                <strong>适用于经销模式。</strong><br>
+                记录经销商的采购付款。<br>
+                输入：客户名称（经销商）、订单金额、支付方式、收款日期。<br>
+                <strong>关联动作：</strong>创建订单后，可关联此收款记录进行核销。
             </td>
         </tr>
         <tr>
-            <td>收益核算</td>
-            <td><span class="tag p2">P2</span></td>
-            <td>简单的收支对比：销售总额 - 制卡成本 - 物流预估成本 = 毛利。</td>
+            <td>销售开票</td>
+            <td><span class="tag p0">P0</span></td>
+            <td>根据收款记录开具增值税发票，上传发票附件。</td>
+        </tr>
+        <tr>
+            <td rowspan="2" style="background-color:#d6eaf8;">分销管理</td>
+            <td>发卡记录</td>
+            <td><span class="tag p0">P0</span></td>
+            <td>
+                <strong>适用于分销模式。</strong><br>
+                记录给分销商发货的卡片批次及数量（此阶段通常不产生资金流）。
+            </td>
+        </tr>
+        <tr>
+            <td>分销结算</td>
+            <td><span class="tag p0">P0</span></td>
+            <td>
+                按月或按批次结算。<br>
+                <strong>自动计算渠道费</strong>：根据批次设定的费率，自动计算应付渠道费。<br>
+                输入：结算金额、渠道费金额、上传发票附件（对方开具的服务费发票）。
+            </td>
         </tr>
     </table>
 
+    <!-- 移除旧的结算管理 -->
+    <!-- 
     <h3 id="module-settlement">4.5 结算管理</h3>
-    <table>
-        <tr>
-            <th>功能点</th>
-            <th>优先级</th>
-            <th>详细描述</th>
-        </tr>
-        <tr>
-            <td>结算对账单</td>
-            <td><span class="tag p0">P0</span></td>
-            <td>
-                <strong>维度：</strong>按分发商 + 时间段（月/季）生成。<br>
-                <strong>统计项：</strong>发货订单数、商品总价值、<strong>应结算金额</strong>（汇总每笔订单按对应批次折扣计算的值）。<br>
-                操作：导出Excel、标记已结算。
-            </td>
-        </tr>
-        <tr>
-            <td>结算明细</td>
-            <td><span class="tag p1">P1</span></td>
-            <td>
-                展示每笔结算依据：订单号、发货时间、关联卡号、<strong>所属批次及折扣</strong>、商品原价、应结算额。<br>
-                <strong>筛选：</strong>仅展示“已发货”且“未结算”的订单。
-            </td>
-        </tr>
-    </table>
+    -->
 
     <h3 id="proto-admin">4.6 后台界面原型</h3>
     <div class="prototype-container">
