@@ -399,6 +399,12 @@
             <td></td>
             <td>增加用户账户体系、微信授权登录、生产与分发流程细化</td>
         </tr>
+        <tr>
+            <td>V1.2</td>
+            <td>2026-02-25</td>
+            <td></td>
+            <td>优化用户端流程，增加系统首页、商城首页，完善兑换中心逻辑</td>
+        </tr>
     </table>
 
     <h2 id="overview">2. 项目概述</h2>
@@ -432,10 +438,10 @@
         <p><strong>1. 制卡生产阶段：</strong><br>
         制卡(Admin) → 关联商品/积分 → 导出加密数据 → 工厂生产/印刷 → 激活批次(Admin) → 分发商/渠道销售</p>
         
-        <p><strong>2. 用户兑换阶段：</strong><br>
-        扫码(User) → <strong><span style="color:#2980b9">[校验: 是否登录]</span> → 未登录则跳转登录/微信授权 →</strong> <span style="color:#e67e22">[校验: 状态/有效期/防伪]</span> → 
-        <br>&nbsp;&nbsp;├─ 校验通过 → 展示商品页 → 填写收货地址 → 提交订单 → <span style="color:#e67e22">[系统: 绑定用户/核销卡片/扣减库存]</span> → 兑换成功
-        <br>&nbsp;&nbsp;└─ 校验失败 → 提示错误(未激活/已使用/已过期)</p>
+        <p><strong>2. 用户兑换/购物阶段：</strong><br>
+        扫码/访问链接(User) → <strong>系统首页</strong> → <strong><span style="color:#2980b9">[校验: 是否登录]</span> → 微信授权登录 →</strong> <span style="color:#e67e22">[判断: 是否有卡密?]</span>
+        <br>&nbsp;&nbsp;├─ <strong>有卡密</strong> → <strong>兑换中心</strong> → 输入卡密 → <span style="color:#e67e22">[校验: 状态/有效期/防伪]</span> → 查看商品 → 填写地址 → 提交订单 → 兑换成功
+        <br>&nbsp;&nbsp;└─ <strong>无卡密</strong> → <strong>商城首页</strong> → 浏览商品(Banner/分类/列表) → 选择商品 → 提交订单(支付/积分) → 购物成功</p>
         
         <p><strong>3. 履约发货阶段：</strong><br>
         后台生成待发货订单 → 仓库发货/回填物流(Admin) → 用户个人中心查看物流 → 确认收货/自动完成</p>
@@ -891,11 +897,11 @@
     <h3>5.1 核心流程</h3>
     <p>
         <strong>前置校验：</strong> 用户扫码进入页面时，前端调用API `GET /api/card/check/{token}`。<br>
-        - <strong>若未登录 -> 跳转“用户登录/注册”页。</strong><br>
+        - <strong>若未登录 -> 跳转“微信授权登录”页。</strong><br>
         - <strong>若未到兑换时间 -> 跳转“未到兑换时间”提示页（展示开始时间）。</strong><br>
         - 若卡片未激活 -> 跳转错误页“卡片未激活”。<br>
         - 若卡片已使用 -> 跳转订单详情页（展示物流）。<br>
-        - <strong></strong>若为积分卡 -> 展示积分商城页（显示余额）。</strong><br>
+        - <strong>若为积分卡 -> 展示积分商城页（显示余额）。</strong><br>
         - 若为商品卡 -> 展示商品兑换页。
     </p>
 
@@ -914,6 +920,14 @@
             </td>
         </tr>
         <tr>
+            <td>商城首页</td>
+            <td>
+                - <strong>Banner轮播</strong>：展示活动海报。<br>
+                - <strong>商品分类</strong>：展示商品类别（如食品、数码等）。<br>
+                - <strong>商品列表</strong>：展示推荐商品，点击可进入详情。
+            </td>
+        </tr>
+        <tr>
             <td>未到兑换时间页</td>
             <td>
                 - 提示图标、文案“未到兑换时间”。<br>
@@ -922,7 +936,7 @@
             </td>
         </tr>
         <tr>
-            <td>兑换首页</td>
+            <td>兑换中心</td>
             <td>
                 <strong>商品卡：</strong><br>
                 - 商品轮播图、商品名称、规格参数。<br>
@@ -932,7 +946,10 @@
                 - 顶部展示<strong>当前积分余额</strong>。<br>
                 - <strong>商品分类筛选</strong>（如数码、家居、食品）。<br>
                 - 商品列表（显示积分价、兑换按钮）。<br>
-                - 购物车/立即购买逻辑。
+                - 购物车/立即购买逻辑。<br>
+                <strong>逻辑：</strong><br>
+                - 支持通过输入卡密进行兑换。<br>
+                - 也支持直接选择商品下单（无卡密场景）。
             </td>
         </tr>
         <tr>
