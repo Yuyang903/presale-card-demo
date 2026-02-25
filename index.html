@@ -950,7 +950,6 @@
                     <div class="distributor-menu-item active" onclick="switchDistributorTab('dashboard', event)" style="padding:15px 20px; color:rgba(255,255,255,0.7); cursor:pointer;">数据概览</div>
                     <div class="distributor-menu-item" onclick="switchDistributorTab('orders', event)" style="padding:15px 20px; color:rgba(255,255,255,0.7); cursor:pointer;">兑换订单</div>
                     <div class="distributor-menu-item" onclick="switchDistributorTab('finance', event)" style="padding:15px 20px; color:rgba(255,255,255,0.7); cursor:pointer;">财务结算</div>
-                    <div class="distributor-menu-item" onclick="switchDistributorTab('invoice', event)" style="padding:15px 20px; color:rgba(255,255,255,0.7); cursor:pointer;">发票记录</div>
                 </div>
                 
                 <div class="admin-content">
@@ -966,12 +965,16 @@
                                 <div style="font-size:24px; font-weight:bold; color:var(--primary-color);">1,000</div>
                             </div>
                             <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
-                                <div style="color:#666; font-size:14px;">已兑换卡片</div>
+                                <div style="color:#666; font-size:14px;">已结算卡片</div>
                                 <div style="font-size:24px; font-weight:bold; color:var(--success-color);">850</div>
                             </div>
                             <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
                                 <div style="color:#666; font-size:14px;">累计结算金额</div>
                                 <div style="font-size:24px; font-weight:bold; color:var(--warning-color);">¥ 255,000.00</div>
+                            </div>
+                            <div class="admin-card" style="flex:1; margin-bottom:0; text-align:center; padding:15px;">
+                                <div style="color:#666; font-size:14px;">累计渠道费用</div>
+                                <div style="font-size:24px; font-weight:bold; color:#17a2b8;">¥ 55,000.00</div>
                             </div>
                         </div>
                     </div>
@@ -1027,15 +1030,14 @@
                             <div class="admin-title">财务结算记录</div>
                         </div>
                         <div class="admin-card">
-                            <div style="margin-bottom:15px; font-weight:bold; border-bottom:1px solid #eee; padding-bottom:10px;">付款记录 (购卡)</div>
+                            <div style="margin-bottom:15px; font-weight:bold; border-bottom:1px solid #eee; padding-bottom:10px;">卡片分发记录</div>
                             <table class="admin-table" style="margin-bottom:30px;">
                                 <thead>
                                     <tr>
                                         <th>日期</th>
                                         <th>批次名称</th>
                                         <th>数量</th>
-                                        <th>实付金额</th>
-                                        <th>支付方式</th>
+                                        <th>卡片面额</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1043,20 +1045,20 @@
                                         <td>2023-10-01</td>
                                         <td>周杰伦新专辑_自营</td>
                                         <td>500</td>
-                                        <td style="font-weight:bold; color:var(--danger-color);">¥ 150,000.00</td>
-                                        <td>对公转账</td>
+                                        <td style="font-weight:bold; color:var(--danger-color);">¥ 300.00</td>
                                     </tr>
                                 </tbody>
                             </table>
 
-                            <div style="margin-bottom:15px; font-weight:bold; border-bottom:1px solid #eee; padding-bottom:10px;">结算记录 (平台结算)</div>
+                            <div style="margin-bottom:15px; font-weight:bold; border-bottom:1px solid #eee; padding-bottom:10px;">结算记录</div>
                             <table class="admin-table">
                                 <thead>
                                     <tr>
                                         <th>结算月份</th>
-                                        <th>发货订单数</th>
-                                        <th>商品总价值</th>
+                                        <th>售卡数量</th>
+                                        <th>卡片面额</th>
                                         <th>结算折扣</th>
+                                        <th>渠道费用金额</th>
                                         <th>应结算金额</th>
                                         <th>状态</th>
                                     </tr>
@@ -1065,8 +1067,9 @@
                                     <tr>
                                         <td>2023-10</td>
                                         <td>120</td>
-                                        <td>¥ 36,000.00</td>
+                                        <td>¥ 300.00</td>
                                         <td>70%</td>
+                                        <td style="font-weight:bold; color:#17a2b8;">¥ 10,800.00</td>
                                         <td style="font-weight:bold; color:var(--success-color);">¥ 25,200.00</td>
                                         <td><span class="tag p0">未结算</span></td>
                                     </tr>
@@ -1075,34 +1078,7 @@
                         </div>
                     </div>
                     
-                    <!-- 4. 发票记录 -->
-                    <div id="dist-tab-invoice" class="distributor-module" style="display:none;">
-                        <div class="admin-header-bar">
-                            <div class="admin-title">发票记录</div>
-                        </div>
-                        <div class="admin-card">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>开票日期</th>
-                                        <th>发票号码</th>
-                                        <th>金额</th>
-                                        <th>备注</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>2023-10-05</td>
-                                        <td>INV-20231005-001</td>
-                                        <td style="color:var(--success-color); font-weight:bold;">¥ 100,000.00</td>
-                                        <td>第一批购卡款发票</td>
-                                        <td><button class="btn btn-secondary btn-sm" onclick="alert('查看发票详情')">查看</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+
 
                 </div>
             </div>
