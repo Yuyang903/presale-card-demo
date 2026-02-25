@@ -202,6 +202,9 @@
             display: block;
             box-sizing: border-box;
         }
+        .p-btn-wechat {
+            background: #07c160;
+        }
         .p-input {
             width: 100%;
             padding: 10px;
@@ -390,11 +393,17 @@
             <td></td>
             <td>基于BRD创建初始版本，包含核心兑换流程</td>
         </tr>
+        <tr>
+            <td>V1.1</td>
+            <td>2026-02-25</td>
+            <td></td>
+            <td>增加用户账户体系、微信授权登录、生产与分发流程细化</td>
+        </tr>
     </table>
 
     <h2 id="overview">2. 项目概述</h2>
-    <p><strong>背景：</strong> 为了连接线上线下场景，公司推出“预售卡”业务。用户持有印有唯一二维码的实物卡，扫码后可直接填写地址兑换商品。</p>
-    <p><strong>核心目标：</strong> 简化兑换体验、闭环数据记录、卡片安全防伪。</p>
+    <p><strong>背景：</strong> 为了连接线上线下场景，公司推出“预售卡”业务。用户持有印有唯一二维码的实物卡，注册登录后，扫码后可直接填写地址兑换商品。</p>
+    <p><strong>核心目标：</strong> 简化兑换体验、沉淀私域用户、闭环数据记录、卡片安全防伪。</p>
 
     <h2 id="global-rules">3. 全局规则 & 流程</h2>
     
@@ -420,16 +429,16 @@
 
     <h3>3.2 业务流程图</h3>
     <div style="background:#f9f9f9; padding:15px; border:1px solid #ddd; border-radius:4px; font-size:13px;">
-        <p><strong>1. 制卡发卡阶段：</strong><br>
-        制卡(Admin) → 导出数据 → 印刷/制作实体卡 → 激活批次(Admin) → 线下发卡给用户</p>
+        <p><strong>1. 制卡生产阶段：</strong><br>
+        制卡(Admin) → 关联商品/积分 → 导出加密数据 → 工厂生产/印刷 → 激活批次(Admin) → 分发商/渠道销售</p>
         
         <p><strong>2. 用户兑换阶段：</strong><br>
-        扫码(User) → <span style="color:#e67e22">[校验: 状态/有效期/防伪]</span> → 
-        <br>&nbsp;&nbsp;├─ 校验通过 → 展示商品页 → 填写收货地址 → 提交订单 → <span style="color:#e67e22">[系统: 核销卡片/扣减库存]</span> → 兑换成功
+        扫码(User) → <strong><span style="color:#2980b9">[校验: 是否登录]</span> → 未登录则跳转登录/微信授权 →</strong> <span style="color:#e67e22">[校验: 状态/有效期/防伪]</span> → 
+        <br>&nbsp;&nbsp;├─ 校验通过 → 展示商品页 → 填写收货地址 → 提交订单 → <span style="color:#e67e22">[系统: 绑定用户/核销卡片/扣减库存]</span> → 兑换成功
         <br>&nbsp;&nbsp;└─ 校验失败 → 提示错误(未激活/已使用/已过期)</p>
         
         <p><strong>3. 履约发货阶段：</strong><br>
-        后台生成待发货订单 → 仓库发货/回填物流(Admin) → 用户查看物流 → 确认收货/自动完成</p>
+        后台生成待发货订单 → 仓库发货/回填物流(Admin) → 用户个人中心查看物流 → 确认收货/自动完成</p>
     </div>
 
     <h3>3.3 关键业务规则</h3>
@@ -437,6 +446,14 @@
         <tr>
             <th width="120">规则模块</th>
             <th>规则描述</th>
+        </tr>
+        <tr>
+            <td><strong>用户账户</strong></td>
+            <td>
+                1. <strong>强制登录</strong>：兑换前必须登录，以建立用户与订单的关联。<br>
+                2. <strong>微信授权</strong>：推荐使用微信一键授权登录，获取OpenID/UnionID作为唯一标识，昵称头像作为展示。<br>
+                3. <strong>手机号</strong>：可选绑定，作为发货联系方式的默认值。
+            </td>
         </tr>
         <tr>
             <td><strong>卡密生成</strong></td>
@@ -538,7 +555,7 @@
             <td>兑换订单列表</td>
             <td><span class="tag p0">P0</span></td>
             <td>
-                展示字段：订单号、关联卡号、商品名称、收货人信息、物流状态、下单时间。<br>
+                展示字段：订单号、关联卡号、商品名称、<strong>关联用户(昵称/手机)</strong>、收货人信息、物流状态、下单时间。<br>
                 筛选：订单状态（待发货/已发货）、手机号。
             </td>
         </tr>
@@ -874,6 +891,7 @@
     <h3>5.1 核心流程</h3>
     <p>
         <strong>前置校验：</strong> 用户扫码进入页面时，前端调用API `GET /api/card/check/{token}`。<br>
+        - <strong>若未登录 -> 跳转“用户登录/注册”页。</strong><br>
         - <strong>若未到兑换时间 -> 跳转“未到兑换时间”提示页（展示开始时间）。</strong><br>
         - 若卡片未激活 -> 跳转错误页“卡片未激活”。<br>
         - 若卡片已使用 -> 跳转订单详情页（展示物流）。<br>
@@ -886,6 +904,14 @@
         <tr>
             <th>页面</th>
             <th>元素/逻辑</th>
+        </tr>
+        <tr>
+            <td>用户登录页</td>
+            <td>
+                - <strong>微信一键登录</strong>（推荐）：点击授权按钮获取微信用户信息。<br>
+                - 手机号登录：输入手机号 + 验证码。<br>
+                - 登录成功后自动跳转回扫码后的落地页。
+            </td>
         </tr>
         <tr>
             <td>未到兑换时间页</td>
@@ -928,6 +954,36 @@
 
     <h3 id="proto-client">5.3 用户端界面原型</h3>
     <div class="prototype-container">
+        
+        <!-- 页面-1：用户登录 -->
+        <div>
+            <div class="prototype-label">【页面 -1】 用户登录/授权</div>
+            <div class="phone-mockup">
+                <div class="phone-header">登录</div>
+                <div class="phone-content" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                    <div style="width:80px; height:80px; background:#eee; border-radius:50%; margin-bottom:20px;">Logo</div>
+                    <h3 style="margin:0 0 30px 0;">欢迎来到享乐派</h3>
+                    
+                    <button class="p-btn p-btn-wechat" style="margin-bottom:15px;">
+                        <span style="margin-right:5px;">💬</span> 微信一键登录
+                    </button>
+                    
+                    <div style="width:100%; border-top:1px solid #ddd; margin:20px 0; position:relative;">
+                        <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:#f5f5f5; padding:0 10px; color:#999; font-size:12px;">或</span>
+                    </div>
+
+                    <div style="width:100%;">
+                        <input type="tel" class="p-input" placeholder="请输入手机号">
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" class="p-input" placeholder="验证码" style="flex:1;">
+                            <button class="p-btn" style="width:100px; margin-top:0; font-size:12px; background:#ccc;">获取验证码</button>
+                        </div>
+                        <button class="p-btn" style="margin-top:10px;">登录</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 页面0：未到兑换时间 -->
         <div>
             <div class="prototype-label">【页面 0】 未到兑换时间</div>
