@@ -9,7 +9,7 @@
             return `${y}-${m}-${d} ${h}:${min}:${s}`;
         }
 
-        // --- 经销管理收款逻辑 ---
+        // --- 收款管理逻辑 ---
 
         function toggleCustomerInput(select) {
             var input = document.getElementById('income-customer-input');
@@ -738,8 +738,6 @@
                 typeHtml = '<span class="tag p1">自营</span>';
             } else if (type === 'distribution') {
                 typeHtml = '<span class="tag p2">分销</span>';
-            } else {
-                typeHtml = '<span class="tag p3">经销</span>';
             }
 
             if (id) {
@@ -1242,9 +1240,6 @@
             } else if (distText.includes('分销')) {
                 distType = '分销';
                 distTypeClass = 'p2';
-            } else if (distText.includes('经销')) {
-                distType = '经销';
-                distTypeClass = 'p3';
             }
             // 简化分发商名称显示
             var distName = distText.split('(')[0].trim();
@@ -1314,7 +1309,8 @@
                  currentFee = parseFloat(text) || 0;
             }
             
-            var remain = totalAmount - currentSettled - currentFee;
+            // 未结金额 = 卡片总金额 - 已结算金额 (不减去渠道费)
+            var remain = totalAmount - currentSettled;
 
             document.getElementById('settlement-ref-id').value = id;
             document.getElementById('settlement-ref-text').innerText = `${distName} - ${batchName} (未结: ¥${remain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
