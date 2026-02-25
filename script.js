@@ -534,6 +534,11 @@
                 // 商品卡隐藏折扣率设置
                 document.getElementById('discount-rate-group').style.display = 'none';
                 document.getElementById('discount-rate-tip').style.display = 'none';
+
+                // 触发一次分发商变更逻辑，以决定是否显示渠道费率
+                var distSelect = document.getElementById('create-card-distributor');
+                if (distSelect) handleDistributorChange(distSelect);
+
             } else {
                 // document.getElementById('type-product-config').style.display = 'none'; // 积分卡制卡时不配置商品
                 document.getElementById('type-points-config').style.display = 'block';
@@ -542,6 +547,34 @@
                 // 积分卡显示折扣率设置
                 document.getElementById('discount-rate-group').style.display = 'block';
                 document.getElementById('discount-rate-tip').style.display = 'block';
+
+                // 积分卡隐藏渠道费率
+                document.getElementById('channel-fee-rate-group').style.display = 'none';
+                document.getElementById('channel-fee-tip').style.display = 'none';
+            }
+        }
+
+        // 处理分发商变更 (新增逻辑)
+        function handleDistributorChange(select) {
+            var value = select.value;
+            var text = select.options[select.selectedIndex].text;
+            var cardType = document.querySelector('input[name="cardType"]:checked').value;
+
+            // 仅当 卡片类型=商品卡 且 分发商类型=分销 (dist_a, dist_b) 时，显示渠道费率
+            // 根据 text 判断类型 (简单判断包含 "分销")
+            // 注意：演示数据中，一直娱(dist_a)和一直娱广州(dist_b)通常被视为分销，
+            // 而 dist_c (天沐) 是经销， d0 是自营
+            // 简单逻辑：如果 value 是 dist_a 或 dist_b，或者 text 包含 "分销"
+            // 更新：用户要求 "如分发商为分销类型分发商，需要录入渠道费率"
+            
+            var isDistribution = text.includes('分销') || value === 'dist_a' || value === 'dist_b';
+
+            if (cardType === 'product' && isDistribution) {
+                document.getElementById('channel-fee-rate-group').style.display = 'block';
+                document.getElementById('channel-fee-tip').style.display = 'block';
+            } else {
+                document.getElementById('channel-fee-rate-group').style.display = 'none';
+                document.getElementById('channel-fee-tip').style.display = 'none';
             }
         }
 
@@ -738,6 +771,8 @@
                 typeHtml = '<span class="tag p1">自营</span>';
             } else if (type === 'distribution') {
                 typeHtml = '<span class="tag p2">分销</span>';
+            } else if (type === 'dealership') {
+                typeHtml = '<span class="tag" style="background:#8e44ad;">经销</span>';
             }
 
             if (id) {
@@ -868,6 +903,13 @@
             var deliveryTime = document.getElementById('create-delivery-time').value || '-';
             var remark = document.getElementById('create-remark').value;
 
+            // 获取渠道费率
+            var channelFeeRate = 0;
+            var channelFeeRateGroup = document.getElementById('channel-fee-rate-group');
+            if (channelFeeRateGroup && channelFeeRateGroup.style.display !== 'none') {
+                channelFeeRate = parseFloat(document.getElementById('channel-fee-rate').value) || 0;
+            }
+
             var cardMode = document.querySelector('input[name="cardNoMode"]:checked').value;
             var startNo = 1; 
             if (cardMode === 'custom') {
@@ -881,6 +923,7 @@
             newRow.dataset.startNo = startNo; // Store start no
             newRow.dataset.linked = "false";
             newRow.dataset.type = cardType;
+            newRow.dataset.channelFeeRate = channelFeeRate; // 存储渠道费率
             newRow.id = 'tr-' + Date.now(); // Ensure ID
             
             // Columns: 0:Chk, 1:Name, 2:Type, 3:Dist, 4:Content, 5:Qty, 6:Time, 7:Status, 8:Action
@@ -1240,12 +1283,40 @@
             } else if (distText.includes('分销')) {
                 distType = '分销';
                 distTypeClass = 'p2';
+            } else if (distText.includes('经销')) {
+                distType = '经销';
+                distTypeClass = '" style="background:#8e44ad;';
             }
             // 简化分发商名称显示
             var distName = distText.split('(')[0].trim();
 
             var totalAmount = quantity * price;
             var id = 'ch-' + Date.now();
+
+            // 尝试获取关联批次的渠道费率
+            // 在实际系统中，应该根据 batchSelect.value 查找对应批次记录。
+            // 这里我们模拟查找：如果分销商是“分销”类型，且批次名称暗示了费率，或者我们默认给一个费率。
+            // 为了演示，如果选了“分销”，我们假设费率为 5% (0.05)，除非批次有特别指定。
+            // 更严谨的做法是：遍历 card-list-view-product 表格，找到对应批次名称的行，读取 data-channelFeeRate
+            
+            var channelFeeRate = 0;
+            if (distType === '分销') {
+                // 尝试查找批次表格
+                var batchRows = document.querySelectorAll('#card-list-view-product tbody tr');
+                for (var i = 0; i < batchRows.length; i++) {
+                    var bRow = batchRows[i];
+                    var bName = bRow.cells[1].innerText.split('\n')[0].trim();
+                    // batchText 可能是 "周杰伦新专辑_自营"
+                    if (batchText.includes(bName) || bName.includes(batchText)) {
+                        if (bRow.dataset.channelFeeRate) {
+                            channelFeeRate = parseFloat(bRow.dataset.channelFeeRate) / 100; // 存的是百分比数值，如 5
+                        }
+                        break;
+                    }
+                }
+                // 如果没找到，默认给 0.05 (5%) 用于演示
+                if (channelFeeRate === 0) channelFeeRate = 0.05; 
+            }
 
             // 创建新行
             var tbody = document.querySelector('#finance-channel-view table tbody');
@@ -1254,6 +1325,7 @@
             tr.dataset.amount = totalAmount;
             tr.dataset.settled = 0;
             tr.dataset.fee = 0;
+            tr.dataset.channelFeeRate = channelFeeRate; // 存储费率 (小数)
             
             // 模拟兑换状态 (全未兑换)
             var redeemed = 0;
@@ -1312,11 +1384,32 @@
             // 未结金额 = 卡片总金额 - 已结算金额 (不减去渠道费)
             var remain = totalAmount - currentSettled;
 
+            // 获取渠道费率
+            var rate = parseFloat(row.dataset.channelFeeRate) || 0;
+            
             document.getElementById('settlement-ref-id').value = id;
             document.getElementById('settlement-ref-text').innerText = `${distName} - ${batchName} (未结: ¥${remain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
             document.getElementById('settlement-amount').value = '';
             document.getElementById('settlement-fee').value = '';
             document.getElementById('settlement-remark').value = '';
+
+            // 存储当前记录的费率，以便计算
+            document.getElementById('createSettlementModal').dataset.currentRate = rate;
+
+            // 如果有费率，自动计算提示
+            var feeInput = document.getElementById('settlement-fee');
+            if (rate > 0) {
+                feeInput.placeholder = "自动计算: 结算金额 * " + (rate * 100) + "%";
+                // 添加监听器实现自动计算
+                document.getElementById('settlement-amount').oninput = function() {
+                    var val = parseFloat(this.value) || 0;
+                    var autoFee = val * rate;
+                    document.getElementById('settlement-fee').value = autoFee.toFixed(2);
+                };
+            } else {
+                feeInput.placeholder = "0.00";
+                document.getElementById('settlement-amount').oninput = null;
+            }
 
             openModal('createSettlementModal');
         }
