@@ -1074,7 +1074,81 @@
         <div id="client-view" class="view-section" style="flex-direction: column; padding: 40px; background: #f4f6f9; overflow-y: auto;">
             <h2 style="text-align: center; margin-bottom: 40px; color: #2c3e50;">预售卡业务全景流程图</h2>
             
-            <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
+            <div style="display:flex; flex-direction:column; gap:40px; margin-bottom: 60px;">
+                <!-- 1. 分销流程 -->
+                <div style="background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top:0; color:#3498db; border-bottom:2px solid #3498db; padding-bottom:10px; display:inline-block;">A. 分销流程 (代销/返佣)</h3>
+                    <div style="display: flex; justify-content: flex-start; align-items: flex-start; gap: 15px; flex-wrap: wrap; margin-top:20px;">
+                        <div class="flow-step">
+                            <div class="step-icon">📝</div>
+                            <div class="step-title">1. 制卡/发卡</div>
+                            <div class="step-desc">后台登记给分发商发了多少数量卡片</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🚚</div>
+                            <div class="step-title">2. 分发商销售</div>
+                            <div class="step-desc">分销商销售卡片</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">📱</div>
+                            <div class="step-title">3. 统计&结算</div>
+                            <div class="step-desc">• 我方收款：<br>我方统计销售数据，支付渠道费给对方<br>
+                                • 对方收款：<br>对方提供销售数据，扣除渠道费后结算给我方</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">💰</div>
+                            <div class="step-title">4. 开票</div>
+                            <div class="step-desc" style="text-align:left; font-size:11px;">
+                                对方开票，业务上传后台
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 经销流程 -->
+                <div style="background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top:0; color:#8e44ad; border-bottom:2px solid #8e44ad; padding-bottom:10px; display:inline-block;">B. 经销流程 (买断/批发)</h3>
+                    <div style="display: flex; justify-content: flex-start; align-items: flex-start; gap: 15px; flex-wrap: wrap; margin-top:20px;">
+                        <div class="flow-step">
+                            <div class="step-icon">💴</div>
+                            <div class="step-title">1. 创建订单</div>
+                            <div class="step-desc">后台录入订单<br>关联卡片批次/数量</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🖥️</div>
+                            <div class="step-title">2. 付款</div>
+                            <div class="step-desc">经销商预付卡片款</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">📦</div>
+                            <div class="step-title">3. 发货 (卡)</div>
+                            <div class="step-desc">交付实体卡给经销商</div>
+                        </div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">
+                            <div class="step-icon">🧾</div>
+                            <div class="step-title">4. 开票</div>
+                            <div class="step-desc">财务根据订单<br>开具发票</div>
+                        </div>
+                        <div class="flow-arrow" style="color:#ccc;">...</div>
+                        <div class="flow-step" style="opacity:0.7;">
+                            <div class="step-icon">🔄</div>
+                            <div class="step-title">后续流程</div>
+                            <div class="step-desc">经销商自行销售<br>用户兑换/我方履约</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 原有通用流程 (保留作为参考或折叠) -->
+            <div style="opacity:0.6; transform:scale(0.9);">
+                <h4 style="text-align:center; color:#999;">(参考) 通用业务环节</h4>
+                <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
                 
                 <!-- Step 1: Distributor -->
                 <div class="flow-step">
@@ -1146,6 +1220,7 @@
                     <div class="step-desc">商家后台处理订单<br>物流发货</div>
                 </div>
 
+            </div>
             </div>
 
             <!-- Card Preview -->
