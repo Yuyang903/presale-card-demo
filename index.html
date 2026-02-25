@@ -72,7 +72,6 @@
                     <div class="admin-menu-item" onclick="switchAdminTab('card-points', event)">积分礼品卡</div>
                     <div class="admin-menu-item" onclick="switchAdminTab('order', event)">订单管理</div>
                     <div class="admin-menu-item" onclick="switchAdminTab('finance', event)">财务管理</div>
-                    <div class="admin-menu-item" onclick="switchAdminTab('settlement', event)">结算管理</div>
                 </div>
                 
                 <div class="admin-content">
@@ -853,67 +852,6 @@
                             <div id="finance-overview-view" style="display:none; text-align:center; padding:50px; color:#999;">
                                 暂无概览数据图表
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- 结算管理模块 -->
-                    <div id="tab-settlement" class="admin-module" style="display:none;">
-                        <div class="admin-header-bar">
-                            <div class="admin-title">结算管理</div>
-                        </div>
-                        
-                        <div class="filter-bar">
-                            <select class="form-control">
-                                <option>所有分发商</option>
-                                <option>一直娱</option>
-                                <option>一直娱 (广州)</option>
-                            </select>
-                            <input type="month" class="form-control">
-                            <button class="btn btn-primary" onclick="alert('功能仅演示')">查询</button>
-                            <button class="btn btn-outline" onclick="alert('功能仅演示')">导出对账单</button>
-                        </div>
-
-                        <div class="admin-card">
-                            <h4 style="margin-top:0; border-bottom:1px solid #eee; padding-bottom:10px;">分发商对账单 (2023年10月)</h4>
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>分发商</th>
-                                        <th>发货订单数</th>
-                                        <th>商品总价值</th>
-                                        <th>结算折扣</th>
-                                        <th>应结算金额</th>
-                                        <th>结算状态</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>一直娱</td>
-                                        <td>120</td>
-                                        <td>¥ 36,000.00</td>
-                                        <td>70%</td>
-                                        <td style="font-weight:bold; color:var(--danger-color);">¥ 25,200.00</td>
-                                        <td><span class="tag p0">未结算</span></td>
-                                        <td>
-                                            <button class="btn btn-success btn-sm">标记结算</button>
-                                            <button class="btn btn-info btn-sm">明细</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>一直娱 (广州)</td>
-                                        <td>50</td>
-                                        <td>¥ 15,000.00</td>
-                                        <td>85%</td>
-                                        <td style="font-weight:bold; color:var(--danger-color);">¥ 12,750.00</td>
-                                        <td><span class="tag p1">已结算</span></td>
-                                        <td>
-                                            <button class="btn btn-secondary btn-sm" disabled>标记结算</button>
-                                            <button class="btn btn-info btn-sm">明细</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
 
