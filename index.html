@@ -471,6 +471,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr data-id="d0" data-type="self_operated">
+                                        <td>享乐派直营</td>
+                                        <td><span class="tag p1">自营</span></td>
+                                        <td>运营部</td>
+                                        <td>020-88888888</td>
+                                        <td><span class="tag p1">合作中</span></td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="editDistributor(this)">编辑</button>
+                                            <button class="btn btn-danger btn-sm" onclick="toggleDistributorStatus(this)">停用</button>
+                                        </td>
+                                    </tr>
                                     <tr data-id="d1" data-type="distribution">
                                         <td>一直娱</td>
                                         <td><span class="tag p2">分销</span></td>
@@ -482,11 +493,22 @@
                                             <button class="btn btn-danger btn-sm" onclick="toggleDistributorStatus(this)">停用</button>
                                         </td>
                                     </tr>
-                                    <tr data-id="d2" data-type="dealership">
+                                    <tr data-id="d2" data-type="distribution">
                                         <td>一直娱 (广州)</td>
-                                        <td><span class="tag p3">经销</span></td>
+                                        <td><span class="tag p2">分销</span></td>
                                         <td>陈总</td>
                                         <td>13987654321</td>
+                                        <td><span class="tag p1">合作中</span></td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" onclick="editDistributor(this)">编辑</button>
+                                            <button class="btn btn-danger btn-sm" onclick="toggleDistributorStatus(this)">停用</button>
+                                        </td>
+                                    </tr>
+                                    <tr data-id="d3" data-type="dealership">
+                                        <td>天沐</td>
+                                        <td><span class="tag p3">经销</span></td>
+                                        <td>刘经理</td>
+                                        <td>0755-12345678</td>
                                         <td><span class="tag p1">合作中</span></td>
                                         <td>
                                             <button class="btn btn-primary btn-sm" onclick="editDistributor(this)">编辑</button>
@@ -653,8 +675,8 @@
                         <div class="admin-card" style="margin-bottom: 20px;">
                             <!-- 财务子Tab -->
                             <div style="display:flex; gap:30px; border-bottom:1px solid #eee; padding-bottom:15px; margin-bottom:15px;">
-                                <div id="ft-income" class="finance-tab active" onclick="switchFinanceTab('income')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">收款记录</div>
-                                <div id="ft-channel" class="finance-tab" onclick="switchFinanceTab('channel')" style="color:#666; cursor:pointer; padding-bottom:5px;">分销渠道账单</div>
+                                <div id="ft-income" class="finance-tab active" onclick="switchFinanceTab('income')" style="font-weight:bold; color:var(--primary-color); border-bottom:2px solid var(--primary-color); padding-bottom:5px; cursor:pointer;">经销管理</div>
+                                <div id="ft-channel" class="finance-tab" onclick="switchFinanceTab('channel')" style="color:#666; cursor:pointer; padding-bottom:5px;">分销管理</div>
                                 <div id="ft-cost" class="finance-tab" onclick="switchFinanceTab('cost')" style="color:#666; cursor:pointer; padding-bottom:5px;">制卡成本</div>
                                 <div id="ft-overview" class="finance-tab" onclick="switchFinanceTab('overview')" style="color:#666; cursor:pointer; padding-bottom:5px;">收支概览</div>
                             </div>
@@ -662,7 +684,7 @@
                             <!-- 1. 收款记录视图 -->
                             <div id="finance-income-view">
                                 <div style="margin-bottom:15px; text-align:right;">
-                                    <button class="btn btn-success" onclick="alert('功能仅演示')">+ 新增收款</button>
+                                    <button class="btn btn-success" onclick="openModal('createIncomeModal')">+ 新增收款</button>
                                 </div>
                                 <table class="admin-table">
                                     <thead>
@@ -673,8 +695,6 @@
                                             <th>实收金额</th>
                                             <th>已开票金额</th>
                                             <th>未开票金额</th>
-                                            <th>支付方式</th>
-                                            <th>经手人</th>
                                             <th>操作</th>
                                         </tr>
                                     </thead>
@@ -686,8 +706,6 @@
                                             <td style="font-weight:bold; color:var(--danger-color);">¥ 15,000.00</td>
                                             <td style="color:#27ae60;">¥ 10,000.00</td>
                                             <td style="color:#e74c3c; font-weight:bold;">¥ 5,000.00</td>
-                                            <td>对公转账</td>
-                                            <td>王经理</td>
                                             <td>
                                                 <button class="btn btn-primary btn-sm" onclick="openInvoiceModal(this)">开票</button>
                                                 <button class="btn btn-info btn-sm" onclick="openInvoiceDetailModal(this)">明细</button>
@@ -700,8 +718,6 @@
                                             <td style="font-weight:bold; color:var(--danger-color);">¥ 600.00</td>
                                             <td style="color:#27ae60;">¥ 0.00</td>
                                             <td style="color:#e74c3c; font-weight:bold;">¥ 600.00</td>
-                                            <td>微信支付</td>
-                                            <td>前台小张</td>
                                             <td>
                                                 <button class="btn btn-primary btn-sm" onclick="openInvoiceModal(this)">开票</button>
                                                 <button class="btn btn-info btn-sm" onclick="openInvoiceDetailModal(this)">明细</button>
@@ -714,7 +730,7 @@
                                             <td style="color:var(--danger-color);">¥ 15,600.00</td>
                                             <td style="color:#27ae60;">¥ 10,000.00</td>
                                             <td style="color:#e74c3c;">¥ 5,600.00</td>
-                                            <td colspan="3"></td>
+                                            <td></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -722,22 +738,25 @@
 
                             <!-- 4. 分销渠道账单视图 (New) -->
                             <div id="finance-channel-view" style="display:none;">
-                                <div style="margin-bottom:15px; text-align:right;">
-                                    <button class="btn btn-success" onclick="openModal('createIssuanceModal')">+ 新增发卡记录</button>
-                                    <button class="btn btn-warning" onclick="openModal('createSettlementModal')">+ 新增结算记录</button>
-                                </div>
-                                <div class="filter-bar">
-                                    <select class="form-control" style="width: 150px;">
-                                        <option>所有分发商</option>
-                                        <option>一直娱 (分销)</option>
-                                        <option>一直娱 (广州) (经销)</option>
-                                    </select>
-                                    <input type="text" class="form-control" placeholder="批次名称" style="width: 180px;">
-                                    <button class="btn btn-primary" onclick="alert('功能仅演示')">查询</button>
+                                <div class="filter-bar" style="display:flex; justify-content: space-between; align-items: center;">
+                                    <div style="display:flex; gap:10px;">
+                                        <select class="form-control" style="width: 150px;">
+                                            <option>所有分发商</option>
+                                            <option>一直娱 (分销)</option>
+                                            <option>一直娱 (广州) (分销)</option>
+                                            <option>天沐 (经销)</option>
+                                        </select>
+                                        <input type="text" class="form-control" placeholder="批次名称" style="width: 180px;">
+                                        <button class="btn btn-primary" onclick="alert('功能仅演示')">查询</button>
+                                    </div>
+                                    <div>
+                                        <button class="btn btn-success" onclick="openModal('createIssuanceModal')">+ 新增发卡记录</button>
+                                    </div>
                                 </div>
                                 <table class="admin-table">
                                     <thead>
                                         <tr>
+                                            <th>发卡日期</th>
                                             <th>分发商 (类型)</th>
                                             <th>关联批次</th>
                                             <th>发卡数量</th>
@@ -750,6 +769,7 @@
                                     </thead>
                                     <tbody>
                                         <tr data-id="ch-001">
+                                            <td>2023-10-01</td>
                                             <td>一直娱 <span class="tag p2">分销</span></td>
                                             <td>周杰伦新专辑_自营</td>
                                             <td>500 张</td>
@@ -760,11 +780,13 @@
                                                 <span style="color:#27ae60;">450</span> / <span style="color:#999;">50</span>
                                             </td>
                                             <td>
+                                                <button class="btn btn-warning btn-sm" onclick="openSettlementModal(this)">新增结算记录</button>
                                                 <button class="btn btn-info btn-sm" onclick="alert('查看结算明细')">明细</button>
                                             </td>
                                         </tr>
                                         <tr data-id="ch-002">
-                                            <td>一直娱 (广州) <span class="tag p3">经销</span></td>
+                                            <td>2023-10-05</td>
+                                            <td>一直娱 (广州) <span class="tag p2">分销</span></td>
                                             <td>周杰伦新专辑_杭州线下</td>
                                             <td>200 张</td>
                                             <td style="font-weight:bold;">¥ 60,000.00</td>
@@ -774,6 +796,23 @@
                                                 <span style="color:#27ae60;">120</span> / <span style="color:#999;">80</span>
                                             </td>
                                             <td>
+                                                <button class="btn btn-warning btn-sm" onclick="openSettlementModal(this)">新增结算记录</button>
+                                                <button class="btn btn-info btn-sm" onclick="alert('查看结算明细')">明细</button>
+                                            </td>
+                                        </tr>
+                                        <tr data-id="ch-003">
+                                            <td>2023-10-10</td>
+                                            <td>天沐 <span class="tag p3">经销</span></td>
+                                            <td>周杰伦新专辑_北京线下</td>
+                                            <td>1000 张</td>
+                                            <td style="font-weight:bold;">¥ 300,000.00</td>
+                                            <td style="color:#27ae60;">¥ 200,000.00</td>
+                                            <td style="color:#e67e22;">¥ 0.00</td>
+                                            <td>
+                                                <span style="color:#27ae60;">50</span> / <span style="color:#999;">950</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-warning btn-sm" onclick="openSettlementModal(this)">新增结算记录</button>
                                                 <button class="btn btn-info btn-sm" onclick="alert('查看结算明细')">明细</button>
                                             </td>
                                         </tr>
@@ -845,6 +884,7 @@
                                 <option>所有分发商</option>
                                 <option>一直娱</option>
                                 <option>一直娱 (广州)</option>
+                                <option>天沐</option>
                             </select>
                             <input type="month" class="form-control">
                             <button class="btn btn-primary" onclick="alert('功能仅演示')">查询</button>
@@ -1326,6 +1366,7 @@
                         <option value="">直营 (无分发商)</option>
                         <option value="dist_a">一直娱</option>
                         <option value="dist_b">一直娱 (广州)</option>
+                        <option value="dist_c">天沐</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1396,7 +1437,10 @@
                     <label>分发商类型 <span style="color:red">*</span></label>
                     <div style="margin-top:5px;">
                         <label style="font-weight:normal; margin-right:20px; cursor:pointer;">
-                            <input type="radio" name="distributorType" value="distribution" checked> 分销 (代销/返佣)
+                            <input type="radio" name="distributorType" value="self_operated" checked> 自营 (直销)
+                        </label>
+                        <label style="font-weight:normal; margin-right:20px; cursor:pointer;">
+                            <input type="radio" name="distributorType" value="distribution"> 分销 (代销/返佣)
                         </label>
                         <label style="font-weight:normal; cursor:pointer;">
                             <input type="radio" name="distributorType" value="dealership"> 经销 (买断/批发)
@@ -1482,9 +1526,10 @@
                             <div style="width: 280px;">
                                 <label style="font-size:12px; color:#666; margin-bottom:5px; display:block; font-weight:normal;">选择分发商</label>
                                 <select class="form-control" style="width:100%;">
-                                    <option value="">直营 (无分发商)</option>
+                                    <option value="">请选择分发商...</option>
                                     <option value="dist_a">一直娱</option>
                                     <option value="dist_b">一直娱 (广州)</option>
+                                    <option value="dist_c">天沐</option>
                                 </select>
                             </div>
                             <div style="width:140px;" id="discount-rate-group">
@@ -1732,8 +1777,10 @@
                     <label>选择分发商 <span style="color:red">*</span></label>
                     <select id="issuance-distributor" class="form-control">
                         <option value="">请选择...</option>
+                        <option value="d0">享乐派直营 (自营)</option>
                         <option value="d1">一直娱 (分销)</option>
-                        <option value="d2">一直娱 (广州) (经销)</option>
+                        <option value="d2">一直娱 (广州) (分销)</option>
+                        <option value="d3">天沐 (经销)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -1751,6 +1798,10 @@
                 <div class="form-group">
                     <label>单张面额/价值 <span style="color:red">*</span></label>
                     <input type="number" id="issuance-price" class="form-control" placeholder="输入单价" value="300">
+                </div>
+                <div class="form-group">
+                    <label>发卡日期 <span style="color:red">*</span></label>
+                    <input type="date" id="issuance-date" class="form-control">
                 </div>
                 <div class="form-group">
                     <label>备注</label>
@@ -1772,13 +1823,10 @@
                 <span style="cursor:pointer;" onclick="closeModal('createSettlementModal')">×</span>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label>关联发卡记录 <span style="color:red">*</span></label>
-                    <select id="settlement-ref" class="form-control">
-                        <option value="">请选择...</option>
-                        <option value="ch-001">一直娱 - 周杰伦新专辑_自营 (未结: ¥50,000)</option>
-                        <option value="ch-002">一直娱 (广州) - 周杰伦新专辑_杭州线下 (未结: ¥10,000)</option>
-                    </select>
+                <input type="hidden" id="settlement-ref-id">
+                <div class="form-group" style="background:#f9f9f9; padding:10px; border-radius:4px; margin-bottom:15px;">
+                    <div style="font-size:12px; color:#666;">当前关联记录：</div>
+                    <div id="settlement-ref-text" style="font-weight:bold; margin-top:5px;">--</div>
                 </div>
                 <div class="form-group">
                     <label>本次实收金额 <span style="color:red">*</span></label>
@@ -1807,6 +1855,59 @@
             <div class="modal-footer">
                 <button class="btn btn-outline" onclick="closeModal('createSettlementModal')">取消</button>
                 <button class="btn btn-primary" onclick="saveSettlement()">确认结算</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗组件：新增收款 -->
+    <div id="createIncomeModal" class="modal-overlay" onclick="closeModal('createIncomeModal', event)">
+        <div class="modal">
+            <div class="modal-header">
+                <span>新增收款</span>
+                <span style="cursor:pointer;" onclick="closeModal('createIncomeModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>收款日期 <span style="color:red">*</span></label>
+                    <input type="date" id="income-date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>客户名称 <span style="color:red">*</span></label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="income-customer-select" class="form-control" onchange="toggleCustomerInput(this)">
+                            <option value="">请选择...</option>
+                            <option value="d1">一直娱 (分销)</option>
+                            <option value="d2">一直娱 (广州) (分销)</option>
+                            <option value="d3">天沐 (经销)</option>
+                            <option value="custom">其他 (手动输入)</option>
+                        </select>
+                        <input type="text" id="income-customer-input" class="form-control" placeholder="输入客户名称" style="display: none;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>卡片批次 <span style="color:red">*</span></label>
+                    <select id="income-batch" class="form-control">
+                        <option value="">请选择...</option>
+                        <option value="b1">周杰伦新专辑_自营</option>
+                        <option value="b2">周杰伦新专辑_杭州线下</option>
+                        <option value="b3">周杰伦新专辑_北京线下</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>购买数量 (张) <span style="color:red">*</span></label>
+                    <input type="number" id="income-quantity" class="form-control" placeholder="输入数量">
+                </div>
+                <div class="form-group">
+                    <label>实收金额 <span style="color:red">*</span></label>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="number" id="income-amount" class="form-control" placeholder="0.00">
+                        <span style="font-size:12px; color:#666;">元</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('createIncomeModal')">取消</button>
+                <button class="btn btn-primary" onclick="saveIncome()">保存</button>
             </div>
         </div>
     </div>
