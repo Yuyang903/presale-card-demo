@@ -13,11 +13,12 @@
         <div class="nav-logo">享乐派预售卡系统</div>
         <div class="nav-items">
             <div class="nav-item active" onclick="switchView('admin', event)">管理后台演示</div>
-            <div class="nav-item" onclick="switchView('client', event)">用户端H5演示</div>
+            <div class="nav-item" onclick="switchView('client', event)">业务流程</div>
             <a href="BRD_预售卡项目.html" target="_blank" class="nav-item" style="text-decoration: none; color: inherit;">BRD文档</a>
             <a href="PRD_预售卡项目.html" target="_blank" class="nav-item" style="text-decoration: none; color: inherit;">PRD文档</a>
             <a href="H5_预售卡用户端.html" target="_blank" class="nav-item" style="text-decoration: none; color: inherit;">H5预售卡用户端</a>
         </div>
+    </div>
 
     <!-- 弹窗组件：关联商品 (通用) -->
     <div id="linkProductModal" class="modal-overlay" onclick="closeModal('linkProductModal', event)">
@@ -57,7 +58,6 @@
                 <button class="btn btn-primary" onclick="saveLinkProducts()">保存关联</button>
             </div>
         </div>
-    </div>
     </div>
 
     <div class="container">
@@ -150,6 +150,7 @@
                                                 <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
                                                 <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
                                                 <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
+                                                <button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>
                                             </td>
                                         </tr>
                                         <tr data-type="product">
@@ -168,6 +169,7 @@
                                                 <button class="btn btn-success btn-sm" onclick="activateBatch(this)">激活</button>
                                                 <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
                                                 <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
+                                                <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
                                                 <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
                                                 <button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>
                                             </td>
@@ -368,8 +370,8 @@
                                             <td>
                                                 <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
                                                 <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
-                                                <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
                                                 <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
+                                                <button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -788,381 +790,192 @@
         </div>
 
         <!-- 视图2：用户端H5 -->
-        <div id="client-view" class="view-section">
-            <div class="mobile-layout">
-
-                <!-- 场景1：未到兑换时间 (展示页模式) -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">商品详情</div>
-                    <div class="phone-content" style="padding-bottom: 60px;">
-                        <!-- 主图 -->
-                        <div style="width:100%; height:250px; background:#e0e0e0; display:flex; align-items:center; justify-content:center; color:#999; margin-bottom:0; position:relative;">
-                            <span style="font-size: 24px;">📸 商品主图轮播</span>
-                            <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.5); color:#fff; padding:2px 8px; border-radius:10px; font-size:12px;">1/5</div>
-                        </div>
-                        
-                        <!-- 标题区域 -->
-                        <div style="background:#fff; padding:15px; margin-bottom:10px;">
-                            <h3 style="margin:0 0 5px 0; font-size:16px; line-height:1.4;">【尊享版】享乐派豪华礼包 | 特级茶叶+坚果礼盒+定制保温杯</h3>
-                            <div class="goods-subtitle">企业定制首选 · 限量发售 · 包含精美礼品袋</div>
-                            <div style="display:flex; justify-content:space-between; color:#999; font-size:12px; margin-top: 10px;">
-                                <span>运费：包邮</span>
-                                <span>月销 1000+</span>
-                                <span>库存 500</span>
-                            </div>
-                        </div>
-
-                        <!-- 用户推荐 -->
-                        <div class="user-recommend">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <h4 style="margin:0; font-size:14px;">用户推荐</h4>
-                                <span style="font-size:12px; color:#999;">查看全部 ></span>
-                            </div>
-                            <div class="recommend-item">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="margin-bottom:3px; font-weight:bold;">王先生</div>
-                                    <div style="line-height:1.4;">包装非常精美，送礼很有面子，茶叶口感也不错！</div>
-                                </div>
-                            </div>
-                            <div class="recommend-item">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="margin-bottom:3px; font-weight:bold;">李女士</div>
-                                    <div style="line-height:1.4;">兑换流程很顺畅，发货也快，五星好评。</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 详情 -->
-                        <div class="m-card">
-                            <h4 style="margin:0 0 10px 0; font-size:14px; border-left:3px solid var(--primary-color); padding-left:8px;">商品详情</h4>
-                            <div style="font-size:13px; color:#666; line-height:1.6;">
-                                <p>精选特级高山茶叶，香气浓郁，回甘悠长。</p>
-                                <div style="width:100%; height:150px; background:#f0f0f0; margin:10px 0; display:flex; align-items:center; justify-content:center; color:#ccc;">详情图 1</div>
-                                <p>进口坚果礼盒，营养美味，健康首选。</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 底部操作栏 -->
-                    <div class="bottom-action-bar">
-                        <div class="nav-icon-btn">
-                            <span>🏠</span>
-                            <span>首页</span>
-                        </div>
-                        <div class="nav-icon-btn">
-                            <span>🎧</span>
-                            <span>客服</span>
-                        </div>
-                        <div class="main-action-btn disabled">
-                            未到兑换时间
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step-arrow">→</div>
-
-                <!-- 场景2：卡片已使用 (展示页模式) -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">商品详情</div>
-                    <div class="phone-content" style="padding-bottom: 60px;">
-                        <!-- 主图 -->
-                        <div style="width:100%; height:250px; background:#e0e0e0; display:flex; align-items:center; justify-content:center; color:#999; margin-bottom:0; position:relative;">
-                            <span style="font-size: 24px;">📸 商品主图轮播</span>
-                        </div>
-                        
-                        <!-- 标题区域 -->
-                        <div style="background:#fff; padding:15px; margin-bottom:10px;">
-                            <h3 style="margin:0 0 5px 0; font-size:16px; line-height:1.4;">【尊享版】享乐派豪华礼包 | 特级茶叶+坚果礼盒+定制保温杯</h3>
-                            <div class="goods-subtitle">企业定制首选 · 限量发售 · 包含精美礼品袋</div>
-                            <div style="display:flex; justify-content:space-between; color:#999; font-size:12px; margin-top: 10px;">
-                                <span>运费：包邮</span>
-                                <span>月销 1000+</span>
-                                <span>库存 500</span>
-                            </div>
-                        </div>
-
-                        <!-- 用户推荐 -->
-                        <div class="user-recommend">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <h4 style="margin:0; font-size:14px;">用户推荐</h4>
-                                <span style="font-size:12px; color:#999;">查看全部 ></span>
-                            </div>
-                            <div class="recommend-item">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="margin-bottom:3px; font-weight:bold;">王先生</div>
-                                    <div style="line-height:1.4;">包装非常精美，送礼很有面子！</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 详情 -->
-                        <div class="m-card">
-                            <h4 style="margin:0 0 10px 0; font-size:14px; border-left:3px solid var(--primary-color); padding-left:8px;">商品详情</h4>
-                            <div style="font-size:13px; color:#666; line-height:1.6;">
-                                <p>精选特级高山茶叶，香气浓郁，回甘悠长。</p>
-                                <div style="width:100%; height:150px; background:#f0f0f0; margin:10px 0; display:flex; align-items:center; justify-content:center; color:#ccc;">详情图 1</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 底部操作栏 -->
-                    <div class="bottom-action-bar">
-                        <div class="nav-icon-btn">
-                            <span>🏠</span>
-                            <span>首页</span>
-                        </div>
-                        <div class="nav-icon-btn">
-                            <span>🎧</span>
-                            <span>客服</span>
-                        </div>
-                        <div class="main-action-btn disabled">
-                            卡片已使用
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step-arrow">→</div>
+        <div id="client-view" class="view-section" style="flex-direction: column; padding: 40px; background: #f4f6f9; overflow-y: auto;">
+            <h2 style="text-align: center; margin-bottom: 40px; color: #2c3e50;">预售卡业务全景流程图</h2>
+            
+            <div style="display: flex; justify-content: center; align-items: flex-start; gap: 20px; flex-wrap: wrap;">
                 
-                <!-- 场景3：正常兑换 (展示页模式) -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">商品详情</div>
-                    <div class="phone-content" style="padding-bottom: 60px;">
-                        <!-- 主图 -->
-                        <div style="width:100%; height:250px; background:#e0e0e0; display:flex; align-items:center; justify-content:center; color:#999; margin-bottom:0; position:relative;">
-                            <span style="font-size: 24px;">📸 商品主图轮播</span>
-                            <div style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.5); color:#fff; padding:2px 8px; border-radius:10px; font-size:12px;">1/5</div>
-                        </div>
-                        
-                        <!-- 标题区域 -->
-                        <div style="background:#fff; padding:15px; margin-bottom:10px;">
-                            <h3 style="margin:0 0 5px 0; font-size:16px; line-height:1.4;">【尊享版】享乐派豪华礼包 | 特级茶叶+坚果礼盒+定制保温杯</h3>
-                            <div class="goods-subtitle">企业定制首选 · 限量发售 · 包含精美礼品袋</div>
-                            <div style="display:flex; justify-content:space-between; color:#999; font-size:12px; margin-top: 10px;">
-                                <span>运费：包邮</span>
-                                <span>月销 1000+</span>
-                                <span>库存 500</span>
-                            </div>
-                        </div>
-
-                        <!-- 用户推荐 -->
-                        <div class="user-recommend">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                                <h4 style="margin:0; font-size:14px;">用户推荐</h4>
-                                <span style="font-size:12px; color:#999;">查看全部 ></span>
-                            </div>
-                            <div class="recommend-item">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="margin-bottom:3px; font-weight:bold;">王先生</div>
-                                    <div style="line-height:1.4;">包装非常精美，送礼很有面子，茶叶口感也不错！</div>
-                                </div>
-                            </div>
-                            <div class="recommend-item">
-                                <div class="avatar"></div>
-                                <div>
-                                    <div style="margin-bottom:3px; font-weight:bold;">李女士</div>
-                                    <div style="line-height:1.4;">兑换流程很顺畅，发货也快，五星好评。</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background:#fff; padding:15px; margin-bottom:10px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px;">
-                                <span style="color:#999;">保障</span>
-                                <span>正品保证 · 极速发货 · 7天无理由</span>
-                                <span style="color:#ccc;">></span>
-                            </div>
-                        </div>
-
-                        <!-- 详情 -->
-                        <div class="m-card">
-                            <h4 style="margin:0 0 10px 0; font-size:14px; border-left:3px solid var(--primary-color); padding-left:8px;">商品详情</h4>
-                            <div style="font-size:13px; color:#666; line-height:1.6;">
-                                <p>精选特级高山茶叶，香气浓郁，回甘悠长。</p>
-                                <div style="width:100%; height:150px; background:#f0f0f0; margin:10px 0; display:flex; align-items:center; justify-content:center; color:#ccc;">详情图 1</div>
-                                <p>进口坚果礼盒，营养美味，健康首选。</p>
-                                <div style="width:100%; height:150px; background:#f0f0f0; margin:10px 0; display:flex; align-items:center; justify-content:center; color:#ccc;">详情图 2</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- 底部操作栏 -->
-                    <div class="bottom-action-bar">
-                        <div class="nav-icon-btn">
-                            <span>🏠</span>
-                            <span>首页</span>
-                        </div>
-                        <div class="nav-icon-btn">
-                            <span>🎧</span>
-                            <span>客服</span>
-                        </div>
-                        <div class="main-action-btn active">
-                            立即兑换
-                        </div>
-                    </div>
+                <!-- Step 1: Distributor -->
+                <div class="flow-step">
+                    <div class="step-icon">🏢</div>
+                    <div class="step-title">1. 创建分发商</div>
+                    <div class="step-desc">录入分发商信息<br>设置合作状态</div>
                 </div>
 
-                <div class="step-arrow">→</div>
+                <div class="flow-arrow">→</div>
 
-                <!-- 场景4：积分兑换 (积分卡模式) -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">积分商城</div>
-                    <div class="phone-content" style="padding-bottom: 60px;">
-                        
-                        <!-- 积分信息卡 -->
-                        <div style="background: linear-gradient(135deg, #3498db, #8e44ad); color: #fff; padding: 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);">
-                            <div style="font-size: 12px; opacity: 0.8;">当前可用积分</div>
-                            <div style="font-size: 32px; font-weight: bold; margin: 5px 0;">300 <span style="font-size: 14px; font-weight: normal;">分</span></div>
-                            <div style="font-size: 12px; opacity: 0.8;">有效期至：2026-12-31</div>
-                        </div>
-                        
-                        <!-- 筛选栏 -->
-                        <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 5px;">
-                            <span style="background: var(--primary-color); color: #fff; padding: 4px 12px; border-radius: 15px; font-size: 12px; flex-shrink: 0;">全部商品</span>
-                            <span style="background: #fff; color: #666; padding: 4px 12px; border-radius: 15px; font-size: 12px; flex-shrink: 0;">数码家电</span>
-                            <span style="background: #fff; color: #666; padding: 4px 12px; border-radius: 15px; font-size: 12px; flex-shrink: 0;">家居生活</span>
-                            <span style="background: #fff; color: #666; padding: 4px 12px; border-radius: 15px; font-size: 12px; flex-shrink: 0;">食品饮料</span>
-                        </div>
-
-                        <!-- 商品列表 -->
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                            <!-- 商品1 -->
-                            <div style="width: calc(50% - 5px); background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                                <div style="height: 120px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;">唱片封面</div>
-                                <div style="padding: 10px;">
-                                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; height: 36px; overflow: hidden;">经典黑胶唱片 - 珍藏版</div>
-                                    <div style="color: var(--warning-color); font-weight: bold; font-size: 14px;">300 积分</div>
-                                    <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;">立即兑换</button>
-                                </div>
-                            </div>
-                            
-                            <!-- 商品2 -->
-                            <div style="width: calc(50% - 5px); background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                                <div style="height: 120px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;">耳机图</div>
-                                <div style="padding: 10px;">
-                                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; height: 36px; overflow: hidden;">无线蓝牙耳机</div>
-                                    <div style="color: var(--warning-color); font-weight: bold; font-size: 14px;">280 积分</div>
-                                    <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;">立即兑换</button>
-                                </div>
-                            </div>
-                            
-                            <!-- 商品3 -->
-                            <div style="width: calc(50% - 5px); background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                                <div style="height: 120px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;">保温杯图</div>
-                                <div style="padding: 10px;">
-                                    <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; height: 36px; overflow: hidden;">智能保温杯</div>
-                                    <div style="color: var(--warning-color); font-weight: bold; font-size: 14px;">150 积分</div>
-                                    <button class="m-btn" style="padding: 5px; margin-top: 5px; font-size: 12px;">立即兑换</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    
-                    <!-- 底部操作栏 -->
-                    <div class="bottom-action-bar">
-                        <div class="nav-icon-btn" style="color: var(--primary-color);">
-                            <span>🏠</span>
-                            <span>商城</span>
-                        </div>
-                        <div class="nav-icon-btn">
-                            <span>👤</span>
-                            <span>我的</span>
-                        </div>
-                    </div>
+                <!-- Step 2: Create Batch -->
+                <div class="flow-step">
+                    <div class="step-icon">📝</div>
+                    <div class="step-title">2. 创建批次</div>
+                    <div class="step-desc">选择卡类型 (商品/积分)<br>设置数量与面额</div>
                 </div>
 
-                <div class="step-arrow">→</div>
+                <div class="flow-arrow">→</div>
 
-                <!-- 场景5：填写订单 -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">确认订单</div>
-                    <div class="phone-content">
-                        <div class="m-card">
-                            <h4 style="margin:0 0 15px 0;">收货人信息</h4>
-                            <input type="text" class="m-input" placeholder="请输入姓名" value="张三">
-                            <input type="tel" class="m-input" placeholder="请输入手机号" value="13800138000">
-                            
-                            <!-- 省市区选择 -->
-                            <div style="position:relative; margin-bottom:10px;">
-                                <input type="text" class="m-input" style="margin-bottom:0; background:#fff;" readonly value="北京市 朝阳区" placeholder="请选择省/市/区" onclick="alert('省市区选择器（演示）')">
-                                <span style="position:absolute; right:10px; top:10px; color:#999; pointer-events:none;">▼</span>
-                            </div>
-                            
-                            <textarea class="m-input" rows="2" placeholder="详细地址：街道门牌号">xx街道xx大厦B座1001</textarea>
-                        </div>
-
-                        <div class="m-card">
-                            <h4 style="margin:0 0 10px 0;">商品信息</h4>
-                            <div style="display:flex; gap:10px;">
-                                <div style="width:60px; height:60px; background:#eee; border-radius:4px; flex-shrink:0;"></div>
-                                <div>
-                                    <div style="font-weight:bold; font-size:14px; margin-bottom:5px; line-height:1.4;">【尊享版】享乐派豪华礼包</div>
-                                    <div style="color:#999; font-size:12px;">规格：默认 (特级茶叶+坚果礼盒+定制保温杯)</div>
-                                    <div style="margin-top:5px; font-size:13px;">x 1</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="m-card">
-                            <h4 style="margin:0 0 10px 0;">备注信息</h4>
-                            <textarea class="m-input" rows="2" placeholder="如有特殊要求请留言（选填）" style="margin-bottom:0;"></textarea>
-                        </div>
-                    </div>
-                    <div style="padding:15px; background:#fff; border-top:1px solid #eee;">
-                        <button class="m-btn">提交订单</button>
-                    </div>
+                <!-- Step 3: Link Product -->
+                <div class="flow-step">
+                    <div class="step-icon">🔗</div>
+                    <div class="step-title">3. 关联商品</div>
+                    <div class="step-desc">绑定可兑换商品池</div>
                 </div>
 
-                <div class="step-arrow">→</div>
+                <div class="flow-arrow">→</div>
 
-                <!-- 场景5：成功页 -->
-                <div class="phone-mockup">
-                    <div class="phone-notch"></div>
-                    <div class="phone-header">兑换结果</div>
-                    <div class="phone-content" style="text-align:center; padding-top:40px;">
-                        <div style="width:80px; height:80px; background:var(--success-color); border-radius:50%; margin:0 auto 15px; color:#fff; font-size:50px; line-height:80px; box-shadow:0 10px 20px rgba(39, 174, 96, 0.3);">✓</div>
-                        <h2 style="margin:0 0 10px 0; font-size:20px;">兑换成功</h2>
-                        <p style="color:#999; font-size:13px; margin-bottom:30px;">商家已收到您的订单，将尽快发货</p>
-                        
-                        <div style="display:flex; justify-content:center; gap:15px; margin-bottom:30px;">
-                            <button class="btn btn-outline" style="border-radius:20px; padding:8px 25px;">查看订单</button>
-                            <button class="btn btn-primary" style="border-radius:20px; padding:8px 25px;">返回首页</button>
-                        </div>
+                <!-- Step 4: Activate -->
+                <div class="flow-step">
+                    <div class="step-icon">✅</div>
+                    <div class="step-title">4. 激活批次</div>
+                    <div class="step-desc">确认无误后激活<br>生成正式卡密</div>
+                </div>
 
-                        <!-- 猜你喜欢 -->
-                        <div style="text-align:left;">
-                            <div style="text-align:center; margin-bottom:15px; color:var(--primary-color); font-weight:bold; position:relative;">
-                                <span style="background:#f5f5f5; padding:0 10px; position:relative; z-index:1;">❤ 猜你喜欢</span>
-                                <div style="position:absolute; top:50%; left:20%; right:20%; height:1px; background:#ddd; z-index:0;"></div>
-                            </div>
-                            <div style="display:flex; flex-wrap:wrap; gap:10px;">
-                                <div style="width:calc(50% - 5px); background:#fff; border-radius:8px; overflow:hidden;">
-                                    <div style="height:140px; background:#e0e0e0;"></div>
-                                    <div style="padding:8px;">
-                                        <div style="font-size:13px; margin-bottom:5px;">精选零食大礼包</div>
-                                    </div>
-                                </div>
-                                <div style="width:calc(50% - 5px); background:#fff; border-radius:8px; overflow:hidden;">
-                                    <div style="height:140px; background:#e0e0e0;"></div>
-                                    <div style="padding:8px;">
-                                        <div style="font-size:13px; margin-bottom:5px;">高端定制马克杯</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="flow-arrow">→</div>
+
+                <!-- Step 5: Produce -->
+                <div class="flow-step">
+                    <div class="step-icon">🏭</div>
+                    <div class="step-title">5. 生产</div>
+                    <div class="step-desc">导出卡密，生产卡片</div>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <!-- Step 6: Distribute -->
+                <div class="flow-step">
+                    <div class="step-icon">🚚</div>
+                    <div class="step-title">6. 分发/销售</div>
+                    <div class="step-desc">分发商/售卖机销售卡片，或线上直接销售</div>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <!-- Step 7: User Redeem -->
+                <div class="flow-step">
+                    <div class="step-icon">📱</div>
+                    <div class="step-title">7. 用户兑换</div>
+                    <div class="step-desc">扫码填写地址兑换商品</div>
+                </div>
+
+                <div class="flow-arrow">→</div>
+
+                <!-- Step 8: Ship -->
+                <div class="flow-step">
+                    <div class="step-icon">📦</div>
+                    <div class="step-title">8. 发货履约</div>
+                    <div class="step-desc">商家后台处理订单<br>物流发货</div>
                 </div>
 
             </div>
+
+            <!-- Card Preview -->
+            <div style="margin-top: 60px; display: flex; justify-content: center; flex-direction: column; align-items: center;">
+                <h3 style="color: #2c3e50; margin-bottom: 20px;">实体卡样卡预览</h3>
+                
+                <div style="display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;">
+                    <!-- Front -->
+                    <div class="card-preview-front" style="
+                        width: 360px; 
+                        height: 220px; 
+                        background: linear-gradient(135deg, #2b2e4a 0%, #1a1c29 100%); 
+                        border-radius: 16px; 
+                        box-shadow: 0 25px 50px rgba(0,0,0,0.4); 
+                        position: relative; 
+                        overflow: hidden; 
+                        color: #fff;
+                        font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+                        transition: all 0.4s ease;
+                        cursor: pointer;
+                        border: 1px solid rgba(255,255,255,0.1);
+                    " onmouseover="this.style.transform='scale(1.02) translateY(-5px); box-shadow: 0 30px 60px rgba(0,0,0,0.5);'" onmouseout="this.style.transform='scale(1) translateY(0); box-shadow: 0 25px 50px rgba(0,0,0,0.4);'">
+                        
+                        <!-- Abstract Shapes/Glow -->
+                        <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.08) 0%, transparent 60%); pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: -20px; right: -20px; width: 150px; height: 150px; background: rgba(255, 255, 255, 0.05); filter: blur(40px); border-radius: 50%;"></div>
+
+                        <!-- Top Row -->
+                        <div style="position: absolute; top: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: center; z-index: 2;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                 <!-- Logo Icon -->
+                                <div style="width: 36px; height: 36px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.2);">
+                                    <span style="font-size: 20px;">🎁</span>
+                                </div>
+                                <span style="font-size: 18px; font-weight: 600; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">享乐派</span>
+                            </div>
+                            <div style="font-size: 10px; opacity: 0.7; letter-spacing: 2px; border: 1px solid rgba(255,255,255,0.3); padding: 4px 8px; border-radius: 20px;">VIP ACCESS</div>
+                        </div>
+
+                        <!-- Chip -->
+                        <div style="position: absolute; top: 85px; left: 25px; width: 45px; height: 35px; background: linear-gradient(135deg, #e0aa3e 0%, #b88a2d 100%); border-radius: 6px; overflow: hidden; z-index: 2; box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);">
+                            <!-- Chip contacts (simple lines) -->
+                            <div style="width:100%; height:100%; position:relative; opacity:0.6;">
+                                <div style="position:absolute; left:0; right:0; top:50%; height:1px; background:#4a3b13;"></div>
+                                <div style="position:absolute; top:0; bottom:0; left:33%; width:1px; background:#4a3b13;"></div>
+                                <div style="position:absolute; top:0; bottom:0; left:66%; width:1px; background:#4a3b13;"></div>
+                                <div style="position:absolute; top:20%; left:20%; right:20%; bottom:20%; border:1px solid #4a3b13; border-radius:2px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row -->
+                        <div style="position: absolute; bottom: 25px; left: 25px; right: 25px; display: flex; justify-content: space-between; align-items: flex-end; z-index: 2;">
+                            <div>
+                                <div style="font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 5px; letter-spacing: 1px;">CARD NUMBER</div>
+                                <div style="font-size: 24px; font-family: 'Courier New', monospace; letter-spacing: 3px; font-weight: 700; background: linear-gradient(to bottom, #fff, #ccc); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">888888</div>
+                            </div>
+                            <div style="background: #fff; padding: 4px; border-radius: 8px;">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://xle.com/gift" style="width: 48px; height: 48px; display: block;" alt="QR">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Back -->
+                    <div class="card-preview-back" style="
+                        width: 360px; 
+                        height: 220px; 
+                        background: #1f2024; 
+                        border-radius: 16px; 
+                        box-shadow: 0 25px 50px rgba(0,0,0,0.2); 
+                        position: relative; 
+                        overflow: hidden; 
+                        color: rgba(255,255,255,0.8);
+                        font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+                        transition: all 0.4s ease;
+                        cursor: pointer;
+                        border: 1px solid rgba(255,255,255,0.05);
+                    " onmouseover="this.style.transform='scale(1.02) translateY(-5px); box-shadow: 0 30px 60px rgba(0,0,0,0.3);'" onmouseout="this.style.transform='scale(1) translateY(0); box-shadow: 0 25px 50px rgba(0,0,0,0.2);'">
+                        
+                        <!-- Instructions -->
+                        <div style="padding: 30px 25px; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center;">
+                            <div style="font-size: 12px; font-weight: 700; margin-bottom: 12px; color: #fff; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; width: fit-content;">享乐派惊喜卡使用说明</div>
+                            
+                            <div style="font-size: 9px; color: #ff6b6b; margin-bottom: 12px; line-height: 1.4; background: rgba(255, 107, 107, 0.1); padding: 6px; border-radius: 4px;">
+                                注意：泄露卡片二维码，可能会导致兑换商品的权利被其他人使用
+                            </div>
+
+                            <div style="font-size: 9px; line-height: 1.6; color: rgba(255,255,255,0.7);">
+                                <div style="display:flex; align-items:flex-start; gap:4px; margin-bottom: 4px;">
+                                    <span style="color:#e0aa3e; font-weight:bold; min-width: 10px;">1.</span>
+                                    <span>刮开涂层，扫描卡片证明二维码查看商品</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; gap:4px; margin-bottom: 4px;">
+                                    <span style="color:#e0aa3e; font-weight:bold; min-width: 10px;">2.</span>
+                                    <span>填写收货地址，提交订单，等待商家发货</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; gap:4px; margin-bottom: 4px;">
+                                    <span style="color:#e0aa3e; font-weight:bold; min-width: 10px;">3.</span>
+                                    <span>您可以扫描二维码，点击订单查看快递单号和快递进度</span>
+                                </div>
+                                <div style="display:flex; align-items:flex-start; gap:4px;">
+                                    <span style="color:#e0aa3e; font-weight:bold; min-width: 10px;">4.</span>
+                                    <span>本卡不记名、不挂失，请妥善保管</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; color: #666; font-size: 12px;">( 支持微信扫码直接兑换 )</div>
+            </div>
+
         </div>
 
     </div>
@@ -1320,46 +1133,6 @@
         </div>
     </div>
 
-    <!-- 弹窗组件：关联商品 (通用) -->
-    <div id="linkProductModal" class="modal-overlay" onclick="closeModal('linkProductModal', event)">
-        <div class="modal">
-            <div class="modal-header">
-                <span id="link-product-modal-title">关联商品</span>
-                <span style="cursor:pointer;" onclick="closeModal('linkProductModal')">×</span>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="link-product-btn-id">
-                <div style="background:#fff3cd; color:#856404; padding:10px; font-size:12px; border-radius:4px; margin-bottom:15px;">
-                    提示：必须关联至少一个商品供用户兑换后才能激活。
-                </div>
-                <div class="form-group">
-                    <label id="link-product-label">可选商品池</label>
-                    <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
-                        <!-- 复用已有的商品列表样式 -->
-                        <div id="link-selected-products" style="margin-bottom: 10px;"></div>
-                        
-                        <div style="display: flex; gap: 5px;">
-                            <select id="link-product-select" class="form-control" style="flex: 1;">
-                                <option value="">请选择商品添加...</option>
-                                <option value="豪华月饼礼盒 (ID: 1001)">豪华月饼礼盒 (ID: 1001)</option>
-                                <option value="坚果大礼包 (ID: 1002)">坚果大礼包 (ID: 1002)</option>
-                                <option value="海鲜大礼包 (ID: 1003)">海鲜大礼包 (ID: 1003)</option>
-                                <option value="经典黑胶唱片 (ID: 2001)">经典黑胶唱片 (ID: 2001)</option>
-                                <option value="无线蓝牙耳机 (ID: 2002)">无线蓝牙耳机 (ID: 2002)</option>
-                                <option value="智能保温杯 (ID: 2003)">智能保温杯 (ID: 2003)</option>
-                            </select>
-                            <button class="btn btn-primary btn-sm" style="width: auto;" onclick="addLinkProduct()">添加</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeModal('linkProductModal')">取消</button>
-                <button class="btn btn-primary" onclick="saveLinkProducts()">保存关联</button>
-            </div>
-        </div>
-    </div>
-
     <!-- 弹窗组件：新增制卡 -->
     <div id="createCardModal" class="modal-overlay" onclick="closeModal('createCardModal', event)">
         <div class="modal" style="width: 650px;">
@@ -1385,29 +1158,6 @@
                         </label>
                     </div>
                 </div>
-
-                <!-- 场景1：商品关联配置 (商品卡专用) -->
-                <!-- 
-                <div id="type-product-config" class="form-group">
-                    <label id="product-config-label">绑定商品 <span style="color:red">*</span></label>
-                    <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; background: #f9f9f9;">
-                        <div id="selected-products" style="margin-bottom: 10px;"></div>
-                        
-                        <div style="display: flex; gap: 5px;">
-                            <select id="product-select" class="form-control" style="flex: 1;" onchange="updateAddBtn()">
-                                <option value="">请选择商品添加...</option>
-                                <option value="豪华月饼礼盒 (ID: 1001)">豪华月饼礼盒 (ID: 1001)</option>
-                                <option value="坚果大礼包 (ID: 1002)">坚果大礼包 (ID: 1002)</option>
-                                <option value="海鲜大礼包 (ID: 1003)">海鲜大礼包 (ID: 1003)</option>
-                                <option value="经典黑胶唱片 (ID: 2001)">经典黑胶唱片 (ID: 2001)</option>
-                                <option value="无线蓝牙耳机 (ID: 2002)">无线蓝牙耳机 (ID: 2002)</option>
-                                <option value="智能保温杯 (ID: 2003)">智能保温杯 (ID: 2003)</option>
-                            </select>
-                            <button id="btn-add-product" class="btn btn-secondary btn-sm" style="width: auto;" onclick="addProduct()" disabled>添加</button>
-                        </div>
-                    </div>
-                </div>
-                -->
 
                 <!-- 场景2：积分卡配置 -->
                 <div id="type-points-config" class="form-group" style="display:none;">
