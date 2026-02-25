@@ -208,11 +208,41 @@
             <li><strong>恶意刷单</strong>：防止通过接口批量试探卡号。</li>
         </ul>
 
-        <h2>8. 后续规划 (Roadmap)</h2>
+        <h2>9. 渠道合作模式解析 (Channel Cooperation Models)</h2>
+        <p>为适应多样化的市场推广需求，系统支持两种主要的分发商合作模式，并对应不同的财务管理流程。</p>
+        
+        <h3>9.1 分销模式 (Distribution Model)</h3>
         <ul>
-            <li><strong>一期</strong>：实现基础的单品兑换功能及用户账户体系。</li>
-            <li><strong>二期</strong>：支持“多选一”兑换（一张卡在多个商品中任选其一）。</li>
-            <li><strong>三期</strong>：增加营销玩法，如兑换后抽奖、分享裂变等。</li>
+            <li><strong>定义</strong>：分发商作为代理销售方，不承担库存积压风险，按实际销售量进行结算。</li>
+            <li><strong>适用对象</strong>：拥有流量但无供应链能力的KOL、MCN机构、小型分销商。</li>
+            <li><strong>业务流程</strong>：
+                <ol>
+                    <li><strong>发卡</strong>：后台登记批次、数量，将卡密数据或实物卡分发给分销商。</li>
+                    <li><strong>销售</strong>：分销商通过自有渠道销售。</li>
+                    <li><strong>结算</strong>：
+                        <ul>
+                            <li><strong>周期</strong>：通常按月结算（根据实际激活/售出数量）。</li>
+                            <li><strong>我方收款模式</strong>：用户直接向我方支付（如线上商城）。我方统计销售额，计算渠道佣金支付给分销商，分销商开具服务费发票。</li>
+                            <li><strong>对方收款模式</strong>：用户向分销商支付。分销商定期提供真实销售报表，扣除约定服务费（佣金）后，将余款支付给我方，并提供服务费发票。</li>
+                        </ul>
+                    </li>
+                </ol>
+            </li>
+        </ul>
+
+        <h3>9.2 经销模式 (Dealership Model)</h3>
+        <ul>
+            <li><strong>定义</strong>：经销商买断货权，预先支付货款，承担销售及库存风险。</li>
+            <li><strong>适用对象</strong>：大型企业采购、具有强分销能力的批发商。</li>
+            <li><strong>业务流程</strong>：
+                <ol>
+                    <li><strong>收款</strong>：经销商根据采购协议，预先支付全额或定金货款。</li>
+                    <li><strong>制单</strong>：后台根据收款金额创建采购订单。</li>
+                    <li><strong>发货</strong>：生成并交付实物卡或卡密数据给经销商。</li>
+                    <li><strong>开票</strong>：我方根据实际收到的货款金额，向经销商开具销售发票。</li>
+                    <li><strong>后续</strong>：经销商自行制定销售策略，用户兑换履约仍由我方负责。</li>
+                </ol>
+            </li>
         </ul>
     </div>
 </body>
