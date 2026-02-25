@@ -501,3 +501,135 @@
             align-self: center;
             font-weight: bold;
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            /* Top Nav */
+            .top-nav {
+                padding: 0 15px;
+                height: auto;
+                flex-direction: column;
+                align-items: flex-start;
+                padding-bottom: 10px;
+            }
+            .nav-logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+            .nav-items {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 5px;
+                display: flex;
+                gap: 10px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-item {
+                white-space: nowrap;
+                padding: 8px 15px;
+                flex-shrink: 0;
+            }
+            
+            /* Container */
+            .container {
+                margin-top: 110px; /* Adjust based on new nav height */
+                height: calc(100vh - 110px);
+            }
+
+            /* Admin Layout */
+            .admin-layout {
+                flex-direction: column;
+            }
+            
+            .admin-sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                overflow-x: auto;
+                padding-top: 0;
+                background: #2c3e50;
+                flex-shrink: 0;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .admin-menu-item, .distributor-menu-item {
+                padding: 15px;
+                white-space: nowrap;
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                flex-shrink: 0;
+            }
+            
+            .admin-menu-item.active {
+                border-left: none;
+                border-bottom-color: var(--primary-color);
+                background: rgba(0,0,0,0.2);
+            }
+            
+            .admin-content {
+                padding: 15px;
+            }
+            
+            /* Cards and Flex containers */
+            .admin-header-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .admin-header-bar > div {
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            /* Dashboard stats */
+            div[style*="display:flex"][style*="gap:20px"] {
+                flex-direction: column;
+                gap: 15px !important;
+            }
+            
+            /* Filter bar */
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+                height: auto;
+            }
+            .filter-bar input, .filter-bar select, .filter-bar button {
+                width: 100% !important;
+                margin-bottom: 5px;
+            }
+            
+            /* Tables */
+            .admin-card {
+                padding: 15px;
+                overflow-x: auto; /* Enable scroll for tables */
+            }
+            .admin-table {
+                min-width: 600px; /* Force scroll */
+            }
+            
+            /* Modals */
+            .modal {
+                width: 95%;
+                max-height: 90vh;
+            }
+            
+            /* Flow chart */
+            #client-view > div[style*="display: flex"] {
+                flex-direction: column;
+                align-items: center;
+            }
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            /* Card Preview in Client View */
+            .card-preview-front, .card-preview-back {
+                width: 100% !important;
+                height: auto !important;
+                aspect-ratio: 1.6;
+            }
+        }
