@@ -465,3 +465,38 @@
             background: #ccc;
             cursor: not-allowed;
         }
+
+        /* ---------------- 流程图样式 ---------------- */
+        .flow-step {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 160px;
+            text-align: center;
+            position: relative;
+            transition: transform 0.3s;
+        }
+        .flow-step:hover {
+            transform: translateY(-5px);
+        }
+        .step-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .step-title {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 8px;
+        }
+        .step-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        .flow-arrow {
+            font-size: 24px;
+            color: #ccc;
+            align-self: center;
+            font-weight: bold;
+        }
