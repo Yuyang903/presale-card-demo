@@ -33,6 +33,27 @@
             document.getElementById('tab-' + tabName).style.display = 'block';
         }
 
+        // 切换分发商后台Tab
+        function switchDistributorTab(tabName, event) {
+            if(event) event.preventDefault();
+            // 更新侧边栏状态
+            document.querySelectorAll('.distributor-menu-item').forEach(el => {
+                el.classList.remove('active');
+                el.style.color = 'rgba(255,255,255,0.7)'; // Reset color
+                el.style.fontWeight = 'normal';
+            });
+            
+            if(event && event.target) {
+                event.target.classList.add('active');
+                event.target.style.color = '#fff';
+                event.target.style.fontWeight = 'bold';
+            }
+            
+            // 切换模块显示
+            document.querySelectorAll('.distributor-module').forEach(el => el.style.display = 'none');
+            document.getElementById('dist-tab-' + tabName).style.display = 'block';
+        }
+
         // 打开弹窗
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('open');
@@ -80,8 +101,8 @@
             // 2. 分发商 (简单匹配)
             var distText = cells[3].innerText.trim();
             var distVal = "";
-            if (distText.includes("分发商A")) distVal = "dist_a";
-            else if (distText.includes("分发商B")) distVal = "dist_b";
+            if (distText.includes("一直娱")) distVal = "dist_a";
+            else if (distText.includes("一直娱 (广州)")) distVal = "dist_b";
             // else 直营 or unknown -> ""
 
             // 3. 时间信息 (生成/开始/发货)
@@ -487,6 +508,7 @@
             document.getElementById('finance-income-view').style.display = 'none';
             document.getElementById('finance-cost-view').style.display = 'none';
             document.getElementById('finance-overview-view').style.display = 'none';
+            document.getElementById('finance-channel-view').style.display = 'none';
             
             document.getElementById('finance-' + tabName + '-view').style.display = 'block';
         }
@@ -588,6 +610,15 @@
             document.getElementById('distributor-contact').value = '';
             document.getElementById('distributor-phone').value = '';
             document.getElementById('distributor-address').value = '';
+            // 重置开票信息
+            document.getElementById('distributor-tax-id').value = '';
+            document.getElementById('distributor-bank').value = '';
+            document.getElementById('distributor-account').value = '';
+            
+            // 重置类型
+            var radios = document.getElementsByName('distributorType');
+            if(radios.length > 0) radios[0].checked = true;
+
             document.getElementById('distributor-modal-title').innerText = '新增分发商';
         }
 
@@ -598,10 +629,21 @@
             
             document.getElementById('distributor-id').value = row.dataset.id;
             document.getElementById('distributor-name').value = cells[0].innerText;
-            document.getElementById('distributor-contact').value = cells[1].innerText;
-            document.getElementById('distributor-phone').value = cells[2].innerText;
-            // 假设地址在 data-address 中，或者此处暂不回填地址演示
+            document.getElementById('distributor-contact').value = cells[2].innerText;
+            document.getElementById('distributor-phone').value = cells[3].innerText;
+            // 回填开票信息
+            document.getElementById('distributor-tax-id').value = row.dataset.taxId || '';
+            document.getElementById('distributor-bank').value = row.dataset.bank || '';
+            document.getElementById('distributor-account').value = row.dataset.account || '';
+            document.getElementById('distributor-address').value = row.dataset.address || '';
             
+            // 回填类型
+            var type = row.dataset.type || 'distribution';
+            var radios = document.getElementsByName('distributorType');
+            for(var i=0; i<radios.length; i++) {
+                if(radios[i].value === type) radios[i].checked = true;
+            }
+
             document.getElementById('distributor-modal-title').innerText = '编辑分发商';
             openModal('editDistributorModal');
         }
@@ -612,19 +654,35 @@
             var name = document.getElementById('distributor-name').value;
             var contact = document.getElementById('distributor-contact').value;
             var phone = document.getElementById('distributor-phone').value;
+            var type = document.querySelector('input[name="distributorType"]:checked').value;
+            
+            // 获取开票信息和地址
+            var address = document.getElementById('distributor-address').value;
+            var taxId = document.getElementById('distributor-tax-id').value;
+            var bank = document.getElementById('distributor-bank').value;
+            var account = document.getElementById('distributor-account').value;
             
             if(!name || !contact || !phone) {
                 alert('请填写完整信息');
                 return;
             }
+            
+            var typeHtml = type === 'distribution' ? '<span class="tag p2">分销</span>' : '<span class="tag p3">经销</span>';
 
             if (id) {
                 // 编辑模式：更新表格
                 var row = document.querySelector(`tr[data-id="${id}"]`);
                 if(row) {
                     row.cells[0].innerText = name;
-                    row.cells[1].innerText = contact;
-                    row.cells[2].innerText = phone;
+                    row.cells[1].innerHTML = typeHtml;
+                    row.cells[2].innerText = contact;
+                    row.cells[3].innerText = phone;
+                    // 更新 dataset
+                    row.dataset.address = address;
+                    row.dataset.taxId = taxId;
+                    row.dataset.bank = bank;
+                    row.dataset.account = account;
+                    row.dataset.type = type;
                 }
             } else {
                 // 新增模式：插入新行
@@ -632,8 +690,17 @@
                 var newId = 'd' + Date.now();
                 var newRow = document.createElement('tr');
                 newRow.dataset.id = newId;
+                
+                // 设置 dataset
+                newRow.dataset.address = address;
+                newRow.dataset.taxId = taxId;
+                newRow.dataset.bank = bank;
+                newRow.dataset.account = account;
+                newRow.dataset.type = type;
+                
                 newRow.innerHTML = `
                     <td>${name}</td>
+                    <td>${typeHtml}</td>
                     <td>${contact}</td>
                     <td>${phone}</td>
                     <td><span class="tag p1">合作中</span></td>
@@ -651,7 +718,7 @@
         // 停用/启用分发商
         function toggleDistributorStatus(btn) {
             var row = btn.closest('tr');
-            var statusCell = row.cells[3];
+            var statusCell = row.cells[4];
             var currentStatus = statusCell.innerText.trim();
             
             if (currentStatus === '合作中') {
@@ -896,4 +963,320 @@
             if (!btn.id) btn.id = 'btn-activate-' + Date.now();
             document.getElementById('activate-target-btn-id').value = btn.id;
             openModal('activateConfirmModal');
+        }
+
+        // --- 财务开票相关逻辑 ---
+
+        // 打开开票弹窗
+        function openInvoiceModal(btn) {
+            var row = btn.closest('tr');
+            var id = row.dataset.id;
+            var amount = parseFloat(row.dataset.amount);
+            var invoiced = parseFloat(row.dataset.invoiced);
+            var remain = amount - invoiced;
+            var customerName = row.cells[1].innerText;
+
+            document.getElementById('invoice-target-id').value = id;
+            document.getElementById('invoice-amount').value = '';
+            document.getElementById('invoice-remain-amount').innerText = remain.toFixed(2);
+            document.getElementById('invoice-number').value = '';
+            document.getElementById('invoice-date').value = formatDate(new Date()).split(' ')[0];
+            document.getElementById('invoice-remark').value = '';
+            document.getElementById('invoice-amount-error').style.display = 'none';
+            
+            // 查找分发商开票信息
+            var infoHtml = '<span style="color:#999;">未找到关联分发商信息</span>';
+            var distRows = document.querySelectorAll('#distributor-table tbody tr');
+            
+            // 简单遍历查找
+            for(var i=0; i<distRows.length; i++) {
+                var dRow = distRows[i];
+                var dName = dRow.cells[0].innerText;
+                if (dName === customerName) {
+                    var taxId = dRow.dataset.taxId || '-';
+                    var bank = dRow.dataset.bank || '-';
+                    var account = dRow.dataset.account || '-';
+                    var phone = dRow.cells[2].innerText;
+                    var address = dRow.dataset.address || '-';
+                    
+                    infoHtml = `
+                        <div><strong>名称：</strong>${dName}</div>
+                        <div><strong>税号：</strong>${taxId}</div>
+                        <div><strong>开户行：</strong>${bank}</div>
+                        <div><strong>账号：</strong>${account}</div>
+                        <div><strong>电话：</strong>${phone}</div>
+                        <div><strong>地址：</strong>${address}</div>
+                    `;
+                    break;
+                }
+            }
+            document.getElementById('invoice-customer-info').innerHTML = infoHtml;
+
+            openModal('invoiceModal');
+        }
+
+        // 校验开票金额
+        function validateInvoiceAmount() {
+            var id = document.getElementById('invoice-target-id').value;
+            var row = document.querySelector(`tr[data-id="${id}"]`);
+            var amount = parseFloat(row.dataset.amount);
+            var invoiced = parseFloat(row.dataset.invoiced);
+            var remain = amount - invoiced;
+            
+            var inputAmount = parseFloat(document.getElementById('invoice-amount').value) || 0;
+            var errorDiv = document.getElementById('invoice-amount-error');
+            
+            if (inputAmount > remain) {
+                errorDiv.style.display = 'block';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+
+        // 提交开票
+        function submitInvoice() {
+            if (!validateInvoiceAmount()) return;
+            
+            var inputAmount = parseFloat(document.getElementById('invoice-amount').value) || 0;
+            if (inputAmount <= 0) {
+                alert('请输入有效的开票金额');
+                return;
+            }
+            
+            var invoiceNo = document.getElementById('invoice-number').value;
+            if (!invoiceNo) {
+                alert('请输入发票号码');
+                return;
+            }
+
+            var id = document.getElementById('invoice-target-id').value;
+            var row = document.querySelector(`tr[data-id="${id}"]`);
+            
+            // 更新数据
+            var currentInvoiced = parseFloat(row.dataset.invoiced);
+            var newInvoiced = currentInvoiced + inputAmount;
+            var totalAmount = parseFloat(row.dataset.amount);
+            var newRemain = totalAmount - newInvoiced;
+            
+            row.dataset.invoiced = newInvoiced;
+            
+            // 更新界面显示
+            // 假设第5列是已开票，第6列是未开票
+            row.cells[4].innerText = '¥ ' + newInvoiced.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            row.cells[5].innerText = '¥ ' + newRemain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            // 记录日志 (模拟)
+            if (!row.dataset.invoiceHistory) {
+                row.dataset.invoiceHistory = JSON.stringify([]);
+            }
+            var history = JSON.parse(row.dataset.invoiceHistory);
+            history.push({
+                date: document.getElementById('invoice-date').value,
+                no: invoiceNo,
+                amount: inputAmount,
+                remark: document.getElementById('invoice-remark').value,
+                operator: 'Admin'
+            });
+            row.dataset.invoiceHistory = JSON.stringify(history);
+
+            closeModal('invoiceModal');
+            alert('开票成功！');
+        }
+
+        // 打开开票明细
+        function openInvoiceDetailModal(btn) {
+            var row = btn.closest('tr');
+            var totalAmount = parseFloat(row.dataset.amount);
+            var invoiced = parseFloat(row.dataset.invoiced);
+            
+            document.getElementById('detail-invoice-ref').innerText = row.cells[1].innerText + ' - ' + row.cells[0].innerText;
+            document.getElementById('detail-total-amount').innerText = '¥ ' + totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            document.getElementById('detail-invoiced-amount').innerText = '¥ ' + invoiced.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            
+            var history = [];
+            if (row.dataset.invoiceHistory) {
+                history = JSON.parse(row.dataset.invoiceHistory);
+            } else {
+                // 如果没有历史记录但有已开票金额，生成一条模拟记录
+                if (invoiced > 0) {
+                     history.push({
+                        date: '2023-10-25',
+                        no: 'INV-MOCK-001',
+                        amount: invoiced,
+                        remark: '历史导入数据',
+                        operator: 'System'
+                    });
+                }
+            }
+            
+            var tbody = document.getElementById('invoice-history-list');
+            tbody.innerHTML = '';
+            
+            history.forEach(item => {
+                var tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.no}</td>
+                    <td style="color:#27ae60; font-weight:bold;">¥ ${parseFloat(item.amount).toFixed(2)}</td>
+                    <td>${item.remark || '-'}</td>
+                    <td>${item.operator}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#999;">暂无开票记录</td></tr>';
+            }
+
+            openModal('invoiceDetailModal');
+        }
+
+        // --- 分销渠道账单逻辑 ---
+
+        // 保存发卡记录
+        function saveIssuance() {
+            var distSelect = document.getElementById('issuance-distributor');
+            var batchSelect = document.getElementById('issuance-batch');
+            var quantity = parseInt(document.getElementById('issuance-quantity').value) || 0;
+            var price = parseFloat(document.getElementById('issuance-price').value) || 0;
+            var remark = document.getElementById('issuance-remark').value;
+
+            if (!distSelect.value || !batchSelect.value || quantity <= 0 || price <= 0) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            var distText = distSelect.options[distSelect.selectedIndex].text;
+            var batchText = batchSelect.options[batchSelect.selectedIndex].text.split('(')[0].trim(); 
+            
+            // 解析分发商类型
+            var distType = '未知';
+            var distTypeClass = 'gray';
+            if (distText.includes('分销')) {
+                distType = '分销';
+                distTypeClass = 'p2';
+            } else if (distText.includes('经销')) {
+                distType = '经销';
+                distTypeClass = 'p3';
+            }
+            // 简化分发商名称显示
+            var distName = distText.split('(')[0].trim();
+
+            var totalAmount = quantity * price;
+            var id = 'ch-' + Date.now();
+
+            // 创建新行
+            var tbody = document.querySelector('#finance-channel-view table tbody');
+            var tr = document.createElement('tr');
+            tr.dataset.id = id;
+            tr.dataset.amount = totalAmount;
+            tr.dataset.settled = 0;
+            tr.dataset.fee = 0;
+            
+            // 模拟兑换状态 (全未兑换)
+            var redeemed = 0;
+            var unredeemed = quantity;
+
+            tr.innerHTML = `
+                <td>${distName} <span class="tag ${distTypeClass}">${distType}</span></td>
+                <td>${batchText}</td>
+                <td>${quantity} 张</td>
+                <td style="font-weight:bold;">¥ ${totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td style="color:#27ae60;">¥ 0.00</td>
+                <td style="color:#e67e22;">¥ 0.00</td>
+                <td>
+                    <span style="color:#27ae60;">${redeemed}</span> / <span style="color:#999;">${unredeemed}</span>
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="alert('查看结算明细')">明细</button>
+                </td>
+            `;
+            
+            // 插入到第一行
+            if(tbody.rows.length > 0) {
+                tbody.insertBefore(tr, tbody.rows[0]);
+            } else {
+                tbody.appendChild(tr);
+            }
+
+            // 更新结算关联下拉框 (动态添加)
+            var settleSelect = document.getElementById('settlement-ref');
+            var option = document.createElement('option');
+            option.value = id;
+            option.text = `${distName} - ${batchText} (未结: ¥${totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
+            settleSelect.add(option);
+
+            closeModal('createIssuanceModal');
+            alert('发卡记录已保存');
+        }
+
+        // 保存结算记录
+        function saveSettlement() {
+            var refId = document.getElementById('settlement-ref').value;
+            var amount = parseFloat(document.getElementById('settlement-amount').value) || 0;
+            var fee = parseFloat(document.getElementById('settlement-fee').value) || 0;
+            var remark = document.getElementById('settlement-remark').value;
+
+            if (!refId) {
+                alert('请选择关联发卡记录');
+                return;
+            }
+            if (amount <= 0 && fee <= 0) {
+                alert('请输入结算金额或渠道费');
+                return;
+            }
+
+            // 查找对应行
+            var row = document.querySelector(`#finance-channel-view tr[data-id="${refId}"]`);
+            if (row) {
+                var currentSettled = parseFloat(row.dataset.settled) || 0;
+                // 若 HTML 中无 data-settled, 尝试从 cell 解析
+                if (isNaN(currentSettled) && row.cells[4]) {
+                     var text = row.cells[4].innerText.replace(/[¥,]/g, '');
+                     currentSettled = parseFloat(text) || 0;
+                }
+
+                var currentFee = parseFloat(row.dataset.fee) || 0;
+                if (isNaN(currentFee) && row.cells[5]) {
+                     var text = row.cells[5].innerText.replace(/[¥,]/g, '');
+                     currentFee = parseFloat(text) || 0;
+                }
+                
+                var totalAmount = parseFloat(row.dataset.amount) || 0;
+                if (isNaN(totalAmount) && row.cells[3]) {
+                     var text = row.cells[3].innerText.replace(/[¥,]/g, '');
+                     totalAmount = parseFloat(text) || 0;
+                }
+
+                var newSettled = currentSettled + amount;
+                var newFee = currentFee + fee;
+
+                // 更新数据
+                row.dataset.settled = newSettled;
+                row.dataset.fee = newFee;
+                row.dataset.amount = totalAmount; 
+
+                // 更新显示
+                row.cells[4].innerText = '¥ ' + newSettled.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                row.cells[5].innerText = '¥ ' + newFee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+                // 更新下拉框文本
+                var select = document.getElementById('settlement-ref');
+                for(var i=0; i<select.options.length; i++) {
+                    if(select.options[i].value === refId) {
+                         var remain = totalAmount - newSettled;
+                         var textParts = select.options[i].text.split('(');
+                         var baseText = textParts[0];
+                         select.options[i].text = `${baseText}(未结: ¥${remain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
+                         break;
+                    }
+                }
+
+                closeModal('createSettlementModal');
+                alert('结算记录已保存');
+            } else {
+                alert('未找到关联记录 (可能已被删除)');
+            }
         }
