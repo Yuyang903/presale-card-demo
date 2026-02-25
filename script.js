@@ -545,8 +545,14 @@
                 
                 // 2. Hide Activate Button
                 btn.style.display = 'none';
+
+                // 3. Hide Link Product Button (if exists)
+                var linkBtn = row.querySelector('button[onclick*="openLinkProductModal"]');
+                if (linkBtn) {
+                    linkBtn.style.display = 'none';
+                }
                 
-                // 3. Close Modal
+                // 4. Close Modal
                 closeModal('activateConfirmModal');
             }
         }
@@ -745,10 +751,12 @@
                 </td>
                 <td>${statusHtml}</td>
                 <td>
+                    <button class="btn btn-success btn-sm" onclick="activateBatch(this)">激活</button>
                     <button class="btn btn-primary btn-sm" onclick="openEditBatchModal(this)">修改</button>
                     <button class="btn btn-info btn-sm" onclick="openBatchDetailModal(this)">详情</button>
                     <button class="btn btn-warning btn-sm" onclick="openLinkProductModal(this)">关联商品</button>
                     <button class="btn btn-secondary btn-sm" onclick="showCardList(this)">卡片</button>
+                    <button class="btn btn-danger btn-sm" onclick="voidBatch(this)">作废</button>
                 </td>
             `;
             
