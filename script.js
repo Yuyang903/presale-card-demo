@@ -9,6 +9,72 @@
             return `${y}-${m}-${d} ${h}:${min}:${s}`;
         }
 
+        // --- 经销管理收款逻辑 ---
+
+        function toggleCustomerInput(select) {
+            var input = document.getElementById('income-customer-input');
+            if (select.value === 'custom') {
+                input.style.display = 'block';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+            }
+        }
+
+        function saveIncome() {
+            var date = document.getElementById('income-date').value;
+            var customerSelect = document.getElementById('income-customer-select');
+            var customerInput = document.getElementById('income-customer-input');
+            var batchSelect = document.getElementById('income-batch');
+            var quantity = parseInt(document.getElementById('income-quantity').value) || 0;
+            var amount = parseFloat(document.getElementById('income-amount').value) || 0;
+
+            var customerName = '';
+            if (customerSelect.value === 'custom') {
+                customerName = customerInput.value.trim();
+            } else if (customerSelect.value) {
+                customerName = customerSelect.options[customerSelect.selectedIndex].text.split('(')[0].trim();
+            }
+
+            if (!date || !customerName || !batchSelect.value || quantity <= 0 || amount <= 0) {
+                alert('请填写完整信息');
+                return;
+            }
+
+            var batchName = batchSelect.options[batchSelect.selectedIndex].text;
+            var content = `${batchName} x ${quantity}张`;
+            var id = 'inc-' + Date.now();
+
+            // 创建新行
+            var tbody = document.querySelector('#finance-income-view table tbody');
+            var tr = document.createElement('tr');
+            tr.dataset.id = id;
+            tr.dataset.amount = amount;
+            tr.dataset.invoiced = 0;
+
+            tr.innerHTML = `
+                <td>${date}</td>
+                <td>${customerName}</td>
+                <td>${content}</td>
+                <td style="font-weight:bold; color:var(--danger-color);">¥ ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td style="color:#27ae60;">¥ 0.00</td>
+                <td style="color:#e74c3c; font-weight:bold;">¥ ${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="openInvoiceModal(this)">开票</button>
+                    <button class="btn btn-info btn-sm" onclick="openInvoiceDetailModal(this)">明细</button>
+                </td>
+            `;
+
+            if(tbody.rows.length > 0) {
+                tbody.insertBefore(tr, tbody.rows[0]);
+            } else {
+                tbody.appendChild(tr);
+            }
+
+            closeModal('createIncomeModal');
+            alert('收款记录已保存');
+        }
+
         // 切换主视图 (后台/用户端)
         function switchView(viewName, event) {
             if(event) event.preventDefault();
@@ -667,7 +733,14 @@
                 return;
             }
             
-            var typeHtml = type === 'distribution' ? '<span class="tag p2">分销</span>' : '<span class="tag p3">经销</span>';
+            var typeHtml = '';
+            if (type === 'self_operated') {
+                typeHtml = '<span class="tag p1">自营</span>';
+            } else if (type === 'distribution') {
+                typeHtml = '<span class="tag p2">分销</span>';
+            } else {
+                typeHtml = '<span class="tag p3">经销</span>';
+            }
 
             if (id) {
                 // 编辑模式：更新表格
@@ -767,16 +840,24 @@
                 typeHtml = '<span class="tag" style="background:#9b59b6;">积分卡</span>';
             }
 
-            var distributorSelect = document.querySelector('#createCardModal select:last-of-type'); 
-            var distributorText = '直营';
+            var distributorText = '';
+            var hasDistributor = false;
             // Find distributor
             var formGroups = document.querySelectorAll('#createCardModal .form-group');
             formGroups.forEach(group => {
                 if (group.innerText.includes('关联分发商')) {
                     var sel = group.querySelector('select');
-                    if (sel && sel.value) distributorText = sel.options[sel.selectedIndex].text.split(' ')[0];
+                    if (sel && sel.value) {
+                        distributorText = sel.options[sel.selectedIndex].text.split(' ')[0];
+                        hasDistributor = true;
+                    }
                 }
             });
+
+            if (!hasDistributor) {
+                alert('请选择分发商');
+                return;
+            }
 
             var quantity = parseInt(document.getElementById('card-quantity').value) || 0;
             if (quantity <= 0) { alert('制卡数量必须大于0'); return; }
@@ -1141,9 +1222,10 @@
             var batchSelect = document.getElementById('issuance-batch');
             var quantity = parseInt(document.getElementById('issuance-quantity').value) || 0;
             var price = parseFloat(document.getElementById('issuance-price').value) || 0;
+            var date = document.getElementById('issuance-date').value;
             var remark = document.getElementById('issuance-remark').value;
 
-            if (!distSelect.value || !batchSelect.value || quantity <= 0 || price <= 0) {
+            if (!distSelect.value || !batchSelect.value || quantity <= 0 || price <= 0 || !date) {
                 alert('请填写完整信息');
                 return;
             }
@@ -1154,7 +1236,10 @@
             // 解析分发商类型
             var distType = '未知';
             var distTypeClass = 'gray';
-            if (distText.includes('分销')) {
+            if (distText.includes('自营')) {
+                distType = '自营';
+                distTypeClass = 'p1';
+            } else if (distText.includes('分销')) {
                 distType = '分销';
                 distTypeClass = 'p2';
             } else if (distText.includes('经销')) {
@@ -1180,6 +1265,7 @@
             var unredeemed = quantity;
 
             tr.innerHTML = `
+                <td>${date}</td>
                 <td>${distName} <span class="tag ${distTypeClass}">${distType}</span></td>
                 <td>${batchText}</td>
                 <td>${quantity} 张</td>
@@ -1190,6 +1276,7 @@
                     <span style="color:#27ae60;">${redeemed}</span> / <span style="color:#999;">${unredeemed}</span>
                 </td>
                 <td>
+                    <button class="btn btn-warning btn-sm" onclick="openSettlementModal(this)">新增结算记录</button>
                     <button class="btn btn-info btn-sm" onclick="alert('查看结算明细')">明细</button>
                 </td>
             `;
@@ -1201,26 +1288,52 @@
                 tbody.appendChild(tr);
             }
 
-            // 更新结算关联下拉框 (动态添加)
-            var settleSelect = document.getElementById('settlement-ref');
-            var option = document.createElement('option');
-            option.value = id;
-            option.text = `${distName} - ${batchText} (未结: ¥${totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
-            settleSelect.add(option);
-
             closeModal('createIssuanceModal');
             alert('发卡记录已保存');
         }
 
+        // 打开结算弹窗
+        function openSettlementModal(btn) {
+            var row = btn.closest('tr');
+            var id = row.dataset.id;
+            var distName = row.cells[1].innerText.split(' ')[0]; // split tag
+            var batchName = row.cells[2].innerText;
+            
+            var totalAmount = parseFloat(row.dataset.amount) || 0;
+            // 尝试获取最新结算金额
+            var currentSettled = parseFloat(row.dataset.settled);
+            if (isNaN(currentSettled) && row.cells[5]) {
+                 var text = row.cells[5].innerText.replace(/[¥,]/g, '');
+                 currentSettled = parseFloat(text) || 0;
+            }
+
+            // 尝试获取最新渠道费
+            var currentFee = parseFloat(row.dataset.fee);
+            if (isNaN(currentFee) && row.cells[6]) {
+                 var text = row.cells[6].innerText.replace(/[¥,]/g, '');
+                 currentFee = parseFloat(text) || 0;
+            }
+            
+            var remain = totalAmount - currentSettled - currentFee;
+
+            document.getElementById('settlement-ref-id').value = id;
+            document.getElementById('settlement-ref-text').innerText = `${distName} - ${batchName} (未结: ¥${remain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
+            document.getElementById('settlement-amount').value = '';
+            document.getElementById('settlement-fee').value = '';
+            document.getElementById('settlement-remark').value = '';
+
+            openModal('createSettlementModal');
+        }
+
         // 保存结算记录
         function saveSettlement() {
-            var refId = document.getElementById('settlement-ref').value;
+            var refId = document.getElementById('settlement-ref-id').value;
             var amount = parseFloat(document.getElementById('settlement-amount').value) || 0;
             var fee = parseFloat(document.getElementById('settlement-fee').value) || 0;
             var remark = document.getElementById('settlement-remark').value;
 
             if (!refId) {
-                alert('请选择关联发卡记录');
+                alert('系统错误：未关联发卡记录');
                 return;
             }
             if (amount <= 0 && fee <= 0) {
@@ -1233,20 +1346,20 @@
             if (row) {
                 var currentSettled = parseFloat(row.dataset.settled) || 0;
                 // 若 HTML 中无 data-settled, 尝试从 cell 解析
-                if (isNaN(currentSettled) && row.cells[4]) {
-                     var text = row.cells[4].innerText.replace(/[¥,]/g, '');
+                if (isNaN(currentSettled) && row.cells[5]) {
+                     var text = row.cells[5].innerText.replace(/[¥,]/g, '');
                      currentSettled = parseFloat(text) || 0;
                 }
 
                 var currentFee = parseFloat(row.dataset.fee) || 0;
-                if (isNaN(currentFee) && row.cells[5]) {
-                     var text = row.cells[5].innerText.replace(/[¥,]/g, '');
+                if (isNaN(currentFee) && row.cells[6]) {
+                     var text = row.cells[6].innerText.replace(/[¥,]/g, '');
                      currentFee = parseFloat(text) || 0;
                 }
                 
                 var totalAmount = parseFloat(row.dataset.amount) || 0;
-                if (isNaN(totalAmount) && row.cells[3]) {
-                     var text = row.cells[3].innerText.replace(/[¥,]/g, '');
+                if (isNaN(totalAmount) && row.cells[4]) {
+                     var text = row.cells[4].innerText.replace(/[¥,]/g, '');
                      totalAmount = parseFloat(text) || 0;
                 }
 
@@ -1259,19 +1372,13 @@
                 row.dataset.amount = totalAmount; 
 
                 // 更新显示
-                row.cells[4].innerText = '¥ ' + newSettled.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                row.cells[5].innerText = '¥ ' + newFee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                row.cells[5].innerText = '¥ ' + newSettled.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                row.cells[6].innerText = '¥ ' + newFee.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-                // 更新下拉框文本
-                var select = document.getElementById('settlement-ref');
-                for(var i=0; i<select.options.length; i++) {
-                    if(select.options[i].value === refId) {
-                         var remain = totalAmount - newSettled;
-                         var textParts = select.options[i].text.split('(');
-                         var baseText = textParts[0];
-                         select.options[i].text = `${baseText}(未结: ¥${remain.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")})`;
-                         break;
-                    }
+                // 检查是否全部结算完成，如果是，则移除“新增结算记录”按钮
+                if ((newSettled + newFee) >= totalAmount) {
+                    var btn = row.querySelector('button.btn-warning');
+                    if (btn) btn.style.display = 'none';
                 }
 
                 closeModal('createSettlementModal');
